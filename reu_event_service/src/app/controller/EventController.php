@@ -16,4 +16,28 @@ class EventController
         $events = Event::all()->makeHidden(['id', 'creator_id'])->toArray();
         return Writer::jsonOutput($response, 200, $events);
     }
+
+    public function getEvent(Request $request, Response $response, $args): Response
+    {
+        try {
+            $event = Event::findOrFail($args['id']);
+        } catch (ModelNotFoundException $e) {
+            $response = $response->withStatus(404)->withHeader('Content-Type', 'application/json');
+            $response->getBody()->write(json_encode([
+                "error" => 404,
+                "message" => 'Model innexistant',
+            ]));
+            return $response;
+        }
+
+        $queryparam = $request->getQueryParams();
+        $data = ["type" => "ressource",
+            "event" => $event,
+            "links" => [
+                'self' => ['href' => $request->getUri() . '']
+            ]];
+        $response = $response->withHeader('Content-Type', 'application/json;charset=utf-8');
+        $response->getBody()->write(json_encode($data));
+        return $response;
+    }
 }
