@@ -24,6 +24,6 @@ $capsule->setAsGlobal();
 $capsule->bootEloquent();
 
 $app->get('/events[/]', EventController::class . ':getEvents');
-$app->get('/events/{id}[/]', EventController::class . ':getEvents');
+$app->get('/events/{id}[/]', EventController::class . ':getEvent');
 
 $app->run();
