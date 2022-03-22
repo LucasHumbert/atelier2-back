@@ -25,5 +25,7 @@ $capsule->bootEloquent();
 
 $app->get('/events[/]', EventController::class . ':getEvents');
 $app->get('/events/{id}[/]', EventController::class . ':getEvent');
+$app->get('/events/{id}/messages[/]', EventController::class . ':getEventMessages');
+$app->get('/events/{id}/users[/]', EventController::class . ':getEventUsers');
 
 $app->run();
