@@ -78,11 +78,11 @@ class EventController
 
             //add link to get event users
             if(isset($users)){
-                $data['links']['users'] = ['href' => 'http://api.event.local:62560/events/' . $event->id .'/users'];
+                $data['links']['users'] = ['href' => 'http://api.backoffice.local:62560/events/' . $event->id .'/users'];
             }
             //add link to get event messages
             if(isset($messages)){
-                $data['links']['messages'] = ['href' => 'http://api.event.local:62560/events/' . $event->id . '/messages'];
+                $data['links']['messages'] = ['href' => 'http://api.backoffice.local:62560/events/' . $event->id . '/messages'];
             }
 
             $response = $response->withHeader('Content-Type', 'application/json;charset=utf-8');
