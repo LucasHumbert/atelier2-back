@@ -11,4 +11,16 @@ class Event extends Model
     public $incrementing = false;
     protected $keyType = 'string';
     public $timestamps = false;
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_event', 'event_id', 'user_id')
+            ->withPivot(['user_id', 'event_id', 'choice']);
+    }
+
+    public function messages()
+    {
+        return $this->belongsToMany(User::class, 'message', 'event_id', 'user_id')
+            ->withPivot(['user_id', 'event_id', 'content', 'date']);
+    }
 }
