@@ -12,9 +12,9 @@ use reu\backoffice\app\utils\Writer;
 
 class EventController
 {
-    public function getEvents(Request $request, Response $response, $args): Response
+    public function getEvents(Request $request, Response $response): Response
     {
-        $events = Event::all()->makeHidden(['id', 'creator_id'])->toArray();
+        $events = Event::all()->toArray();
         return Writer::jsonOutput($response, 200, $events);
     }
 
