@@ -9,6 +9,7 @@ require_once __DIR__ . '/../src/vendor/autoload.php';
 use Illuminate\Database\Capsule\Manager;
 use reu\backoffice\app\controller\EventController;
 use reu\backoffice\app\controller\UserController;
+use reu\backoffice\app\middlewares\CheckToken;
 use Slim\App;
 
 $settings = require_once __DIR__ . '/../src/app/conf/settings.php';
@@ -32,6 +33,8 @@ $app->add(function ($req, $res, $next) {
         ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
         ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
 });
+
+$app->add(CheckToken::class . ':checkLevel');
 
 $app->options('/{routes:.+}', function ($request, $response, $args) {
     return $response;
