@@ -137,8 +137,8 @@ class AuthController
         $user->refresh_token = bin2hex(random_bytes(32));
         $user->save();
         $data = [
-            'access-token' => $token,
-            'refresh-token' => $user->refresh_token
+            'accessToken' => $token,
+            'refreshToken' => $user->refresh_token
         ];
 
         return Writer::jsonOutput($rs, 200, $data);
