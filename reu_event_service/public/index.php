@@ -23,6 +23,19 @@ $capsule->addConnection(parse_ini_file($c['settings']['dbconf']));
 $capsule->setAsGlobal();
 $capsule->bootEloquent();
 
+//Middlewares
+$app->add(function ($req, $res, $next) {
+    $response = $next($req, $res);
+    return $response
+        ->withHeader('Access-Control-Allow-Origin', 'http://mysite')
+        ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+});
+
+$app->options('/{routes:.+}', function ($request, $response, $args) {
+    return $response;
+});
+
 $app->get('/events[/]', EventController::class . ':getEvents');
 $app->get('/events/{id}[/]', EventController::class . ':getEvent');
 $app->get('/events/{id}/messages[/]', EventController::class . ':getEventMessages');
