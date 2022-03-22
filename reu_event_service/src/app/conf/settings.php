@@ -3,5 +3,5 @@
 return [
     'settings' => [
         'displayErrorDetails' => true,
-        'dbconf' => __DIR__ . '/commande.db.conf.ini'],
+        'dbconf' => __DIR__ . '/event.db.conf.ini'],
 ];

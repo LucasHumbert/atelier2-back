@@ -28,6 +28,22 @@ services:
     depends_on:
       - mysql.event
 
+  api.backoffice:
+    image: 'canals/php:latest'
+    environment:
+      - VHOST_HOSTNAME=api.backoffice.local
+      - VHOST_DOCROOT=/var/www/public
+    ports:
+      - '62563:80'
+    volumes:
+      - './reu_backoffice_service/public:/var/www/public'
+      - './reu_backoffice_service/src:/var/www/src'
+    working_dir: /var/www/src
+    networks:
+      - reu.net
+    depends_on:
+      - mysql.event
+
   mysql.event:
     image: 'mariadb:latest'
     command: '--default-authentication-plugin=mysql_native_password --character-set-server=utf8 --collation-server=utf8_general_ci'
