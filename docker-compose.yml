@@ -1,11 +1,3 @@
-#
-#  Squelette Docker-compose.yml pour le projet Le Bon Sandwich
-#  documentation et utilisation de l'image canals/php sur
-#  https://gitlab.univ-lorraine.fr/canals5/docker-php
-#
-
-
-
 version: '3'
 networks:
   reu.net:
@@ -57,7 +49,7 @@ services:
     networks:
       - reu.net
     volumes:
-      - './reu_event_service/sql:/var/sql'
+      - './reu_event_service/sql:/var/sql'     
 
   adminer:
     image: adminer
@@ -65,3 +57,19 @@ services:
       - '62562:8080'
     networks:
       - reu.net
+
+  api.auth:
+    image: 'canals/php:latest'
+    environment:
+      - VHOST_HOSTNAME=api.auth.local
+      - VHOST_DOCROOT=/var/www/public
+    ports:
+      - '62563:80'
+    volumes:
+      - './reu_auth_service/public:/var/www/public'
+      - './reu_auth_service/src:/var/www/src'
+    working_dir: /var/www/src
+    networks:
+      - reu.net
+    depends_on:
+      - mysql.event 
