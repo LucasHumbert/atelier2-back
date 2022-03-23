@@ -59,7 +59,7 @@ class AuthController
                     return Writer::jsonOutput($rs, 404, ['error' => 'Incorrect password']);
                 }
             } else {
-                return Writer::jsonOutput($rs, 404, ['error' => 'Some important fields are empty']);
+                return Writer::jsonOutput($rs, 404, ['error' => 'Some fiels are missing']);
             }
         }
         return Writer::jsonOutput($rs, 201, ['user' => $user]);

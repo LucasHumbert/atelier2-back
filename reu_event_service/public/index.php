@@ -55,4 +55,9 @@ $app->get('/events/{id}/users[/]', EventController::class . ':getEventUsers');
 $app->post('/events[/]', EventController::class . ':postEvent')
     ->add(new Validation($postEventValidators));
 
+$app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function($req, $res) {
+    $handler = $this->notFoundHandler; // handle using the default Slim page not found handler
+    return $handler($req, $res);
+});
+
 $app->run();

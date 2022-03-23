@@ -15,7 +15,7 @@ class EventController
 {
     public function getEvents(Request $request, Response $response, $args): Response
     {
-        $events = Event::all()->makeHidden(['id', 'creator_id'])->toArray();
+        $events = Event::all()->where('public', '=', true)->makeHidden(['id', 'creator_id'])->toArray();
         return Writer::jsonOutput($response, 200, $events);
     }
 
