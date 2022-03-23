@@ -8,6 +8,7 @@ use reu\event\app\model\User;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use reu\event\app\utils\Writer;
+use Ramsey\Uuid\Uuid;
 
 
 class EventController
@@ -145,5 +146,32 @@ class EventController
         $response = $response->withHeader('Content-Type', 'application/json;charset=utf-8');
         $response->getBody()->write(json_encode($data));
         return $response;
+    }
+
+    public function postEvent (Request $request, Response $response, $args): Response
+    {
+        $pars = $request->getParsedBody();
+        if (!isset($pars['title'], $pars['description'],$pars['date'],$pars['address'],$pars['lat'],$pars['lon'],$pars['public'])) {
+            return Writer::jsonOutput($response, 422, ["message" => 'Attribut nom non existant']);
+        }
+
+        try{
+            $event =  new Event;
+            $event->id =  Uuid::uuid4();
+            $event->creator_id = filter_var($pars['creator_id'],FILTER_SANITIZE_NUMBER_INT);
+            $event->title = filter_var($pars['title'],FILTER_SANITIZE_STRING);
+            $event->description = filter_var($pars['description'],FILTER_SANITIZE_STRING);
+            $date = strtotime(filter_var($pars['date'], FILTER_SANITIZE_STRING));
+            $event->date = date('y-m-d h:i:s', $date);
+            $event->address = filter_var($pars['adress'],FILTER_SANITIZE_STRING);
+            $event->lat = filter_var($pars['lat'],FILTER_SANITIZE_NUMBER_FLOAT);
+            $event->lon = filter_var($pars['lon'],FILTER_SANITIZE_NUMBER_FLOAT);
+            $event->public = $pars['public'];
+            $event->save();
+
+        } catch (\Exception $e) {
+            return Writer::jsonOutput($response, 500, ['message' => $e]);
+        }
+        return Writer::jsonOutput($response, 200, ['event' => $event]);
     }
 }
