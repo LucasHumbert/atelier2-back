@@ -23,4 +23,9 @@ class Event extends Model
         return $this->belongsToMany(User::class, 'message', 'event_id', 'user_id')
             ->withPivot(['user_id', 'event_id', 'content', 'date']);
     }
+
+    public function guests()
+    {
+        return $this->hasMany(Guest::class, 'event_id');
+    }
 }

@@ -4,6 +4,7 @@ namespace reu\event\app\controller;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use reu\event\app\model\Event;
+use reu\event\app\model\Guest;
 use reu\event\app\model\User;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -62,6 +63,10 @@ class EventController
                 }
             }
 
+            if (isset($queryparam['embed']) && in_array('guests', $queryparam['embed'])) {
+                $guests = Guest::all()->where('event_id', '=', $args['id']);
+            }
+
             $data = ["type" => "ressource",
                 "event" => $event->makeHidden(['messages', 'users'])];
 
@@ -75,6 +80,11 @@ class EventController
                 $data['messages'] = $messages;
             }
 
+            //add guests to the response
+            if(isset($guests)){
+                $data['guests'] = $guests;
+            }
+
             $data["links"] = ['self' => ['href' => $request->getUri() . '']];
 
             //add link to get event users
@@ -85,6 +95,11 @@ class EventController
             if(isset($messages)){
                 $data['links']['messages'] = ['href' => 'http://api.event.local:62560/events/' . $event->id . '/messages'];
             }
+            //add link to get event messages
+            if(isset($guests)){
+                $data['links']['guests'] = ['href' => 'http://api.event.local:62560/events/' . $event->id . '/guests'];
+            }
+
             return Writer::jsonOutput($response, 200, $data);
         }
 
