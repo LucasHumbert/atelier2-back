@@ -26,7 +26,7 @@ services:
       - VHOST_HOSTNAME=api.backoffice.local
       - VHOST_DOCROOT=/var/www/public
     ports:
-      - '62563:80'
+      - '62564:80'
     volumes:
       - './reu_backoffice_service/public:/var/www/public'
       - './reu_backoffice_service/src:/var/www/src'
