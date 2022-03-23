@@ -20,7 +20,7 @@ class checkToken
     }
 
     public function checkLevel(Request $request, Response $response, callable $next) {
-        // récupérer l'identifiant de cmmde dans la route et le token
+
         if(!isset($request->getHeader('Authorization')[0])){
             return Writer::jsonOutput($response, 401, ['message' => 'no authorization header']);
         }
@@ -30,8 +30,8 @@ class checkToken
 
         if($token->upr->level < 10) {
             return Writer::jsonOutput($response, 401, ['message' => 'Unauthorized']);
+        } else {
+            return $next($request, $response);
         }
-
-        return $next($request, $response);
     }
 }
