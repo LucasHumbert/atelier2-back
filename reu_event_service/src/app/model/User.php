@@ -3,6 +3,7 @@
 namespace reu\event\app\model;
 
 use Illuminate\Database\Eloquent\Model;
+use Respect\Validation\Rules\Even;
 
 class User extends Model
 {
@@ -13,13 +14,13 @@ class User extends Model
 
     public function events()
     {
-        return $this->belongsToMany('App\Model\Event', 'user_event', 'user_id', 'event_id')
+        return $this->belongsToMany(Event::class, 'user_event', 'user_id', 'event_id')
                 ->withPivot(['user_id', 'event_id', 'choice']);
     }
 
     public function messages()
     {
-        return $this->belongsToMany('App\Model\Event', 'messages', 'user_id', 'event_id')
+        return $this->belongsToMany(User::class, 'messages', 'user_id', 'event_id')
             ->withPivot(['user_id', 'event_id', 'content', 'date']);
     }
 }

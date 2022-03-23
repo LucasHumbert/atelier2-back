@@ -49,6 +49,7 @@ $app->options('/{routes:.+}', function ($request, $response, $args) {
 });
 
 //Events routes
+//add user_id to return all events created by specific user
 $app->get('/events[/]', EventController::class . ':getEvents');
 $app->get('/events/{id}[/]', EventController::class . ':getEvent');
 $app->get('/events/{id}/messages[/]', EventController::class . ':getEventMessages');
@@ -58,6 +59,7 @@ $app->post('/events[/]', EventController::class . ':postEvent')
 
 //Users routes
 $app->get('/users[/]', UserController::class . ':getUsers');
+$app->get('/users/{id}/events', UserController::class . ':getUsersEvents');
 
 //
 //$app->get('users/{id}/events');
