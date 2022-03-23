@@ -31,7 +31,7 @@ class EventController
                 "error" => 404,
                 "message" => 'Model innexistant',
             ]));
-            return $response;
+            return Writer::jsonOutput($response, 404, ['message' => 'Model innexistant']);
         }
 
         //if the request contains 'embed' parameter
@@ -84,10 +84,7 @@ class EventController
             if(isset($messages)){
                 $data['links']['messages'] = ['href' => 'http://api.event.local:62560/events/' . $event->id . '/messages'];
             }
-
-            $response = $response->withHeader('Content-Type', 'application/json;charset=utf-8');
-            $response->getBody()->write(json_encode($data));
-            return $response;
+            return Writer::jsonOutput($response, 200, $data);
         }
 
         //response without parameters
@@ -97,9 +94,7 @@ class EventController
                 'self' => ['href' => $request->getUri() . '']
             ]];
 
-        $response = $response->withHeader('Content-Type', 'application/json;charset=utf-8');
-        $response->getBody()->write(json_encode($data));
-        return $response;
+        return Writer::jsonOutput($response, 200, $data);
     }
 
     public function getEventMessages(Request $request, Response $response, $args): Response
