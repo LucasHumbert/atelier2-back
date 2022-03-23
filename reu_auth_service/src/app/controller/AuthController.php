@@ -127,6 +127,7 @@ class AuthController
             'iat' => time(),
             'exp' => time() + (12 * 30 * 24 * 3600),
             'upr' => [
+                'id' => $user->id,
                 'email' => $user->mail,
                 'firstname' => $user->firstname,
                 'lastname' => $user->lastname,

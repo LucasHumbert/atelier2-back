@@ -2,6 +2,8 @@
 
 namespace reu\event\app\controller;
 
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use reu\event\app\model\Event;
 use reu\event\app\model\User;
@@ -9,10 +11,18 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use reu\event\app\utils\Writer;
 use Ramsey\Uuid\Uuid;
+use Slim\Container;
 
 
 class EventController
 {
+    private $c;
+
+    public function __construct(Container $c)
+    {
+        $this->c = $c;
+    }
+
     public function getEvents(Request $request, Response $response, $args): Response
     {
         $events = Event::all()->makeHidden(['id', 'creator_id'])->toArray();
@@ -151,6 +161,10 @@ class EventController
     public function postEvent (Request $request, Response $response, $args): Response
     {
         $pars = $request->getParsedBody();
+        $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
+
+        $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
+
         if (!isset($pars['title'], $pars['description'],$pars['date'],$pars['address'],$pars['lat'],$pars['lon'],$pars['public'])) {
             return Writer::jsonOutput($response, 422, ["message" => 'Attribut nom non existant']);
         }
@@ -158,19 +172,23 @@ class EventController
         try{
             $event =  new Event;
             $event->id =  Uuid::uuid4();
-            $event->creator_id = filter_var($pars['creator_id'],FILTER_SANITIZE_NUMBER_INT);
+            $event->creator_id = $token->upr->id;
             $event->title = filter_var($pars['title'],FILTER_SANITIZE_STRING);
             $event->description = filter_var($pars['description'],FILTER_SANITIZE_STRING);
             $date = strtotime(filter_var($pars['date'], FILTER_SANITIZE_STRING));
             $event->date = date('y-m-d h:i:s', $date);
-            $event->address = filter_var($pars['adress'],FILTER_SANITIZE_STRING);
+            $event->address = filter_var($pars['address'],FILTER_SANITIZE_STRING);
             $event->lat = filter_var($pars['lat'],FILTER_SANITIZE_NUMBER_FLOAT);
             $event->lon = filter_var($pars['lon'],FILTER_SANITIZE_NUMBER_FLOAT);
-            $event->public = $pars['public'];
+            if($pars['public'] == "true"){
+                $event->public = 1;
+            } else {
+                $event->public = 0;
+            }
             $event->save();
 
         } catch (\Exception $e) {
-            return Writer::jsonOutput($response, 500, ['message' => $e]);
+            return Writer::jsonOutput($response, 200, ['message' => $e]);
         }
         return Writer::jsonOutput($response, 200, ['event' => $event]);
     }
