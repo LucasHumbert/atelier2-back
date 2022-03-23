@@ -13,7 +13,16 @@ class UserController
 {
     public function getUsers(Request $request, Response $response): Response
     {
-        $users = Event::all()->toArray();
-        return Writer::jsonOutput($response, 200, $users);
+        $users = User::all();
+        foreach ($users as $user) {
+            if(strtotime(date("Y-m-d H:i:s")) - (strtotime($user->updated_at)) > (86400*365)){
+                $user->inactive = 1;
+            }
+            else{
+                $user->inactive = 0;
+            }
+        }
+
+        return Writer::jsonOutput($response, 200, ['users' => $users]);
     }
 }
