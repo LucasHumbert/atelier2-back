@@ -8,6 +8,7 @@ require_once __DIR__ . '/../src/vendor/autoload.php';
 
 use Illuminate\Database\Capsule\Manager;
 use reu\event\app\controller\EventController;
+use reu\event\app\controller\UserController;
 use Slim\App;
 use DavidePastore\Slim\Validation\Validation as Validation;
 use Respect\Validation\Validator as v;
@@ -47,13 +48,19 @@ $app->options('/{routes:.+}', function ($request, $response, $args) {
     return $response;
 });
 
+//Events routes
 $app->get('/events[/]', EventController::class . ':getEvents');
 $app->get('/events/{id}[/]', EventController::class . ':getEvent');
 $app->get('/events/{id}/messages[/]', EventController::class . ':getEventMessages');
 $app->get('/events/{id}/users[/]', EventController::class . ':getEventUsers');
-
 $app->post('/events[/]', EventController::class . ':postEvent')
     ->add(new Validation($postEventValidators));
+
+//Users routes
+$app->get('/users[/]', UserController::class . ':getUsers');
+
+//
+//$app->get('users/{id}/events');
 
 $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function($req, $res) {
     $handler = $this->notFoundHandler; // handle using the default Slim page not found handler
