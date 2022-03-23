@@ -14,8 +14,30 @@ class EventController
 {
     public function getEvents(Request $request, Response $response): Response
     {
-        $events = Event::all()->toArray();
-        return Writer::jsonOutput($response, 200, $events);
+        $events = Event::with('messages')->get();
+
+        foreach ($events as $event) {
+            $event->inactive = 0;
+
+            if(count($event->messages) == 0) {
+                if(strtotime(date("Y-m-d H:i:s")) - (strtotime($event->date)) > (86400*365)){
+                    $event->inactive = 1;
+                }
+            }
+            else {
+                $lastMessage = $event->messages[0]->pivot->date;
+                foreach ($event->messages as $message) {
+                    if(strtotime($message->pivot->date) > strtotime($lastMessage)){
+                        $lastMessage = $message->pivot->date;
+                    }
+                }
+                if(strtotime(date("Y-m-d H:i:s")) - (strtotime($lastMessage)) > (86400*365)){
+                    $event->inactive = 1;
+                }
+            }
+        }
+
+        return Writer::jsonOutput($response, 200, ['events' => $events->makeHidden(['messages'])]);
     }
 
     public function getEvent(Request $request, Response $response, $args): Response
