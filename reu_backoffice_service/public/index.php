@@ -41,9 +41,11 @@ $app->options('/{routes:.+}', function ($request, $response, $args) {
 //Event routes
 $app->get('/events[/]', EventController::class . ':getEvents')->add(CheckToken::class . ':checkLevel');
 $app->get('/events/{id}[/]', EventController::class . ':getEvent')->add(CheckToken::class . ':checkLevel');
+$app->delete('/events/{id}[/]', EventController::class . ':deleteEvent')->add(CheckToken::class . ':checkLevel');
 
 //User routes
 $app->get('/users[/]', UserController::class . ':getUsers')->add(CheckToken::class . ':checkLevel');
+$app->delete('/users/{id}[/]', UserController::class . ':deleteUser')->add(CheckToken::class . ':checkLevel');
 
 $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function($req, $res) {
     $handler = $this->notFoundHandler; // handle using the default Slim page not found handler
