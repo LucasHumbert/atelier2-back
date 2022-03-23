@@ -25,4 +25,11 @@ class UserController
 
         return Writer::jsonOutput($response, 200, ['users' => $users]);
     }
+
+    public function deleteUser(Request $request, Response $response, $args): Response {
+        $event = User::find($args['id'])->delete();
+        $response = $response->withHeader('Content-Type', 'application/json;charset=utf-8');
+        $response->getBody()->write(json_encode(['response' => 'User deleted']));
+        return $response;
+    }
 }

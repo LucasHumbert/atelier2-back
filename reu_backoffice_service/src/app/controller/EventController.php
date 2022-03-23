@@ -174,4 +174,15 @@ class EventController
         $response->getBody()->write(json_encode($data));
         return $response;
     }
+
+    public function deleteEvent(Request $request, Response $response, $args): Response
+    {
+        $event = Event::find($args['id']);
+        $event->messages()->wherePivot('event_id', '=', $args['id'])->detach();
+        $event->delete();
+
+        $response = $response->withHeader('Content-Type', 'application/json;charset=utf-8');
+        $response->getBody()->write(json_encode(['response' => 'Event deleted']));
+        return $response;
+    }
 }
