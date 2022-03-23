@@ -6,7 +6,8 @@
     "ramsey/uuid": "^3.7",
     "illuminate/database":"^8.0",
     "monolog/monolog": "^2.1",
-    "ext-json": "*"
+    "ext-json": "*",
+    "davidepastore/slim-validation": "^0.5.1"
   },
   "autoload": {
     "psr-4" : {
