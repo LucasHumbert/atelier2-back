@@ -33,6 +33,7 @@ class EventController
                 }
                 if(strtotime(date("Y-m-d H:i:s")) - (strtotime($lastMessage)) > (86400*365)){
                     $event->inactive = 1;
+                    $event->lastMessage = $lastMessage;
                 }
             }
         }
