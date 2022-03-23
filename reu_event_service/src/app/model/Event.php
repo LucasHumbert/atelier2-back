@@ -10,7 +10,7 @@ class Event extends Model
     protected $table = 'event';
     public $incrementing = false;
     protected $keyType = 'string';
-    public $timestamps = false;
+    public $timestamps = true;
 
     public function users()
     {
