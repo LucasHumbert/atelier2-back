@@ -18,6 +18,11 @@ class HomeController
         $events = Event::all();
         $eventsCount = count($events);
 
-        return Writer::jsonOutput($response, 200, ['nbUsers' => $usersCount, 'nbEvents' => $eventsCount]);
+        $messagesCount = 0;
+        foreach ($users as $user) {
+            $messagesCount += count($user->messages);
+        }
+
+        return Writer::jsonOutput($response, 200, ['nbUsers' => $usersCount, 'nbEvents' => $eventsCount, 'nbMessages' => $messagesCount]);
     }
 }

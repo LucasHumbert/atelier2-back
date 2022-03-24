@@ -27,7 +27,9 @@ class UserController
     }
 
     public function deleteUser(Request $request, Response $response, $args): Response {
-        $event = User::find($args['id'])->delete();
+        $user = User::find($args['id']);
+        $user->events()->wherePivot('user_id', '=', $args['id'])->detach();
+        $user->delete();
         $response = $response->withHeader('Content-Type', 'application/json;charset=utf-8');
         $response->getBody()->write(json_encode(['response' => 'User deleted']));
         return $response;
