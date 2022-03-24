@@ -19,6 +19,9 @@ class EventController
         foreach ($events as $event) {
             $event->inactive = 0;
 
+            $creatorUser = User::find($event->creator_id, ['firstname', 'lastname']);
+            $event->creatorUser = $creatorUser;
+
             if(count($event->messages) == 0) {
                 if(strtotime(date("Y-m-d H:i:s")) - (strtotime($event->date)) > (86400*365)){
                     $event->inactive = 1;

@@ -61,7 +61,7 @@ $app->post('/events/{event_id}/users[/]', EventController::class . ':postChoice'
 
 //Users routes
 $app->get('/users[/]', UserController::class . ':getUsers');
-$app->get('/users/{id}/events', UserController::class . ':getUsersEvents');
+$app->get('/users/{token}/events', UserController::class . ':getUsersEvents');
 
 //
 //$app->get('users/{id}/events');

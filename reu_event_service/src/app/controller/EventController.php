@@ -27,12 +27,20 @@ class EventController
     public function getEvents(Request $request, Response $response, $args): Response
     {
         $queryparam = $request->getQueryParams();
-        if (!empty($queryparam) && isset($queryparam['creator_id'])) {
-            $events = Event::all()->where('creator_id', '=', $queryparam['creator_id'])->makeHidden(['id', 'creator_id'])->toArray();;
-            return Writer::jsonOutput($response, 200, $events);
+        if (!empty($queryparam) && in_array('creator_id', $queryparam['filter'])) {
+            $tokenstring = $queryparam['creator_token'];
+            try {
+                $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
+            }
+            catch (\Exception $e){
+                return Writer::jsonOutput($response, 403, ['message' => $e]);
+            }
+
+            $events = Event::all()->where('creator_id', '=', $token->upr->id)->makeHidden(['id', 'creator_id'])->toArray();;
+            return Writer::jsonOutput($response, 200, ['events' => $events]);
         }
         $events = Event::all()->where('public', '=', true)->makeHidden(['id', 'creator_id'])->toArray();
-        return Writer::jsonOutput($response, 200, $events);
+        return Writer::jsonOutput($response, 200, ['events' => $events]);
     }
 
     public function getEvent(Request $request, Response $response, $args): Response
@@ -41,6 +49,8 @@ class EventController
         try {
             $event = Event::with('messages', 'users')
                 ->where('id', '=', $args['id'])->first();
+            $creatorUser = User::find($event->creator_id, ['firstname', 'lastname', 'mail']);
+            $event->creatorUser = $creatorUser;
 
         } catch (ModelNotFoundException $e) {
             $response = $response->withStatus(404)->withHeader('Content-Type', 'application/json');
@@ -74,6 +84,7 @@ class EventController
                     $users[] = ['user_id' => $user->id,
                         'firstname' => $user->firstname,
                         'lastname' => $user->lastname,
+                        'choice' => $event_user->pivot->choice
                     ];
                 }
             }

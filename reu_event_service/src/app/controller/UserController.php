@@ -15,6 +15,7 @@ use Slim\Container;
 class UserController
 {
     private $c;
+
     public function __construct(Container $c)
     {
         $this->c = $c;
@@ -29,8 +30,15 @@ class UserController
     public function getUsersEvents(Request $request, Response $response, $args)
     {
         try {
+            $tokenstring = $args['token'];
+            $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
+        }
+        catch (\Exception $e){
+            return Writer::jsonOutput($response, 403, ['message' => $e]);
+        }
+        try {
             $user = User::with('events')
-                ->where('id','=',$args['id'])
+                ->where('id','=',$token->upr->id)
                 ->first();
             $res = [];
             foreach($user->events as $event_utilisateur){
@@ -40,7 +48,8 @@ class UserController
 
 
         } catch (ModelNotFoundException $e) {
-            return Writer::jsonOutput($response, 404, ['message' => 'Event introuvable']);
+
+            return Writer::jsonOutput($response, 404, ['message' => 'Events introuvable']);
         }
 
         return Writer::jsonOutput($response, 200, ['events' => $res]);
