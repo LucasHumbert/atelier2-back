@@ -28,8 +28,14 @@ class UserController
 
     public function deleteUser(Request $request, Response $response, $args): Response {
         $user = User::find($args['id']);
+        $events = Event::where('creator_id', '=', $args['id'])->get();
         $user->events()->wherePivot('user_id', '=', $args['id'])->detach();
+        $user->messages()->wherePivot('user_id', '=', $args['id'])->detach();
+        foreach ($events as $event) {
+            $event->delete();
+        }
         $user->delete();
+
         $response = $response->withHeader('Content-Type', 'application/json;charset=utf-8');
         $response->getBody()->write(json_encode(['response' => 'User deleted']));
         return $response;
