@@ -48,6 +48,7 @@ class UserController
 
 
         } catch (ModelNotFoundException $e) {
+
             return Writer::jsonOutput($response, 404, ['message' => 'Events introuvable']);
         }
 

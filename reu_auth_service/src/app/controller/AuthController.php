@@ -76,8 +76,6 @@ class AuthController
         } else {
             try {
                 $tokenstring = sscanf($rq->getHeader('Authorization')[0], "Bearer %s")[0];
-
-
                 $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
                 $rs->getBody()->write(json_encode(['profile' => $token->upr]));
                 $rs = $rs->withStatus(200)->withHeader('Content-type', 'application/json');
