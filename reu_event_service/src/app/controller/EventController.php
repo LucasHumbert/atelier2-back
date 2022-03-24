@@ -89,6 +89,24 @@ class EventController
                 }
             }
 
+            //get user connected of the event
+            if (isset($queryparam['filter']) && in_array('userConnected', $queryparam['filter'])) {
+                $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
+                $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
+                try {
+                    $event = Event::with('users')->first();
+                    foreach ($event->users as $userEvent) {
+                        if($userEvent->pivot->user_id === $token->upr->id){
+                            return Writer::jsonOutput($response, 200, ['inEvent' => true,'choice' => $userEvent->pivot->choice]);
+                        }
+                    }
+                    return Writer::jsonOutput($response, 200, ['inEvent' => false]);
+                }
+                catch (\Exception $e){
+                    return Writer::jsonOutput($response, $e->getCode(), ['message => $e']);
+                }
+            }
+
             if (isset($queryparam['embed']) && in_array('guests', $queryparam['embed'])) {
                 $guests = Guest::all()->where('event_id', '=', $args['id']);
             }
