@@ -27,8 +27,16 @@ class EventController
     public function getEvents(Request $request, Response $response, $args): Response
     {
         $queryparam = $request->getQueryParams();
-        if (!empty($queryparam) && isset($queryparam['creator_id'])) {
-            $events = Event::all()->where('creator_id', '=', $queryparam['creator_id'])->makeHidden(['id', 'creator_id'])->toArray();;
+        if (!empty($queryparam) && isset($queryparam['creator_token'])) {
+            $tokenstring = $queryparam['creator_token'];
+            try {
+                $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
+            }
+            catch (\Exception $e){
+                return Writer::jsonOutput($response, 403, ['message' => $e]);
+            }
+
+            $events = Event::all()->where('creator_id', '=', $token->upr->id)->makeHidden(['id', 'creator_id'])->toArray();;
             return Writer::jsonOutput($response, 200, $events);
         }
         $events = Event::all()->where('public', '=', true)->makeHidden(['id', 'creator_id'])->toArray();
