@@ -41,6 +41,8 @@ class EventController
         try {
             $event = Event::with('messages', 'users')
                 ->where('id', '=', $args['id'])->first();
+            $creatorUser = User::find($event->creator_id, ['firstname', 'lastname', 'mail']);
+            $event->creatorUser = $creatorUser;
 
         } catch (ModelNotFoundException $e) {
             $response = $response->withStatus(404)->withHeader('Content-Type', 'application/json');
