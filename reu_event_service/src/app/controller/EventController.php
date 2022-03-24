@@ -27,7 +27,7 @@ class EventController
     public function getEvents(Request $request, Response $response, $args): Response
     {
         $queryparam = $request->getQueryParams();
-        if (!empty($queryparam) && isset($queryparam['creator_token'])) {
+        if (!empty($queryparam) && in_array('creator_id', $queryparam['filter'])) {
             $tokenstring = $queryparam['creator_token'];
             try {
                 $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
@@ -37,10 +37,10 @@ class EventController
             }
 
             $events = Event::all()->where('creator_id', '=', $token->upr->id)->makeHidden(['id', 'creator_id'])->toArray();;
-            return Writer::jsonOutput($response, 200, $events);
+            return Writer::jsonOutput($response, 200, ['events' => $events]);
         }
         $events = Event::all()->where('public', '=', true)->makeHidden(['id', 'creator_id'])->toArray();
-        return Writer::jsonOutput($response, 200, $events);
+        return Writer::jsonOutput($response, 200, ['events' => $events]);
     }
 
     public function getEvent(Request $request, Response $response, $args): Response
@@ -84,6 +84,7 @@ class EventController
                     $users[] = ['user_id' => $user->id,
                         'firstname' => $user->firstname,
                         'lastname' => $user->lastname,
+                        'content' => $event_user->pivot->choice
                     ];
                 }
             }
