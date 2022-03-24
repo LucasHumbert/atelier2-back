@@ -84,7 +84,7 @@ class EventController
                     $users[] = ['user_id' => $user->id,
                         'firstname' => $user->firstname,
                         'lastname' => $user->lastname,
-                        'content' => $event_user->pivot->choice
+                        'choice' => $event_user->pivot->choice
                     ];
                 }
             }
