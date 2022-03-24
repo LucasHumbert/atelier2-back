@@ -2,15 +2,24 @@
 
 namespace reu\event\app\controller;
 
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use reu\event\app\model\Event;
 use reu\event\app\model\User;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use reu\event\app\utils\Writer;
+use Slim\Container;
 
 class UserController
 {
+    private $c;
+    public function __construct(Container $c)
+    {
+        $this->c = $c;
+    }
+
     public function getUsers(Request $request, Response $response)
     {
         $users = User::all();
@@ -31,7 +40,7 @@ class UserController
 
 
         } catch (ModelNotFoundException $e) {
-            return Writer::jsonOutput($response, 404, ['message' => 'Expertise introuvable']);
+            return Writer::jsonOutput($response, 404, ['message' => 'Event introuvable']);
         }
 
         return Writer::jsonOutput($response, 200, ['events' => $res]);
