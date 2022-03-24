@@ -8,6 +8,7 @@ require_once __DIR__ . '/../src/vendor/autoload.php';
 
 use Illuminate\Database\Capsule\Manager;
 use reu\backoffice\app\controller\EventController;
+use reu\backoffice\app\controller\HomeController;
 use reu\backoffice\app\controller\UserController;
 use reu\backoffice\app\middlewares\CheckToken;
 use Slim\App;
@@ -37,6 +38,9 @@ $app->add(function ($req, $res, $next) {
 $app->options('/{routes:.+}', function ($request, $response, $args) {
     return $response;
 });
+
+//Home route
+$app->get('/homeInfos[/]', HomeController::class . ':getInfos')->add(CheckToken::class . ':checkLevel');
 
 //Event routes
 $app->get('/events[/]', EventController::class . ':getEvents')->add(CheckToken::class . ':checkLevel');
