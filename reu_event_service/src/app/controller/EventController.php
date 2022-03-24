@@ -198,8 +198,8 @@ class EventController
             $date = strtotime(filter_var($pars['date'], FILTER_SANITIZE_STRING));
             $event->date = date('y-m-d h:i:s', $date);
             $event->address = filter_var($pars['address'],FILTER_SANITIZE_STRING);
-            $event->lat = filter_var($pars['lat'],FILTER_SANITIZE_NUMBER_FLOAT);
-            $event->lon = filter_var($pars['lon'],FILTER_SANITIZE_NUMBER_FLOAT);
+            $event->lat = $pars['lat'];
+            $event->lon = $pars['lon'];
             if($pars['public'] == "true"){
                 $event->public = 1;
             } else {
