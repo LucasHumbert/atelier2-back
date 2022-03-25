@@ -8,6 +8,7 @@ require_once __DIR__ . '/../src/vendor/autoload.php';
 
 use Illuminate\Database\Capsule\Manager;
 use reu\event\app\controller\EventController;
+use reu\event\app\controller\GuestController;
 use reu\event\app\controller\UserController;
 use Slim\App;
 use DavidePastore\Slim\Validation\Validation as Validation;
@@ -59,11 +60,13 @@ $app->post('/events[/]', EventController::class . ':postEvent')
 $app->post('/events/{event_id}/users[/]', EventController::class . ':postChoice');
 $app->put('/events/{event_id}/users[/]', EventController::class . ':putChoice');
 
-
-
 //Users routes
 $app->get('/users[/]', UserController::class . ':getUsers');
 $app->get('/users/{token}/events', UserController::class . ':getUsersEvents');
+
+//Guests routes
+$app->get('/guests/{idEvent}[/]', GuestController::class . ':getGuests');
+$app->post('/guests/{idEvent}[/]', GuestController::class . ':postGuest');
 
 //
 //$app->get('users/{id}/events');
