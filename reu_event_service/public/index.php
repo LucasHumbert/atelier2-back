@@ -57,6 +57,7 @@ $app->get('/events/{id}/users[/]', EventController::class . ':getEventUsers');
 $app->post('/events[/]', EventController::class . ':postEvent')
     ->add(new Validation($postEventValidators));
 $app->post('/events/{event_id}/users[/]', EventController::class . ':postChoice');
+$app->put('/events/{event_id}/users[/]', EventController::class . ':putChoice');
 
 
 //Users routes
