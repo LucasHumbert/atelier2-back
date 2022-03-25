@@ -59,6 +59,8 @@ $app->post('/events[/]', EventController::class . ':postEvent')
 $app->post('/events/{event_id}/users[/]', EventController::class . ':postChoice');
 $app->put('/events/{event_id}/users[/]', EventController::class . ':putChoice');
 
+// Bonjour faut que je push ça dsl
+
 
 //Users routes
 $app->get('/users[/]', UserController::class . ':getUsers');
