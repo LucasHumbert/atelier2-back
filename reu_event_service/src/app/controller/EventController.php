@@ -241,6 +241,7 @@ class EventController
         }
         return Writer::jsonOutput($response, 200, ['event' => $event]);
     }
+
     public function postChoice (Request $request, Response $response, $args): Response
     {
         $pars = $request->getParsedBody();
