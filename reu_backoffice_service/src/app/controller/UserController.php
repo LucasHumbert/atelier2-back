@@ -26,6 +26,43 @@ class UserController
         return Writer::jsonOutput($response, 200, ['users' => $users]);
     }
 
+    public function getUser(Request $request, Response $response, $args): Response
+    {
+        $user = User::find($args['id']);
+        if(strtotime(date("Y-m-d H:i:s")) - (strtotime($user->updated_at)) > (86400*365)){
+            $user->inactive = 1;
+        }
+        else{
+            $user->inactive = 0;
+        }
+
+        $events = Event::where('creator_id', '=', $args['id'])->get();
+
+        foreach ($events as $event) {
+            $event->inactive = 0;
+
+            if(count($event->messages) == 0) {
+                if(strtotime(date("Y-m-d H:i:s")) - (strtotime($event->date)) > (86400*365)){
+                    $event->inactive = 1;
+                }
+            }
+            else {
+                $lastMessage = $event->messages[0]->pivot->date;
+                foreach ($event->messages as $message) {
+                    if(strtotime($message->pivot->date) > strtotime($lastMessage)){
+                        $lastMessage = $message->pivot->date;
+                    }
+                }
+                if(strtotime(date("Y-m-d H:i:s")) - (strtotime($lastMessage)) > (86400*365)){
+                    $event->inactive = 1;
+                    $event->lastMessage = $lastMessage;
+                }
+            }
+        }
+
+        return Writer::jsonOutput($response, 200, ['user' => $user, 'events' => $events]);
+    }
+
     public function deleteUser(Request $request, Response $response, $args): Response {
         $user = User::find($args['id']);
         $events = Event::where('creator_id', '=', $args['id'])->get();
