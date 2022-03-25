@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '930774b736c2e16aad9bb56f55ddaf585e234fa7',
+        'reference' => '780a508be9de1a8c3153990eea25aecaa953f499',
         'name' => '__root__',
         'dev' => true,
     ),
@@ -16,7 +16,16 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '930774b736c2e16aad9bb56f55ddaf585e234fa7',
+            'reference' => '780a508be9de1a8c3153990eea25aecaa953f499',
+            'dev_requirement' => false,
+        ),
+        'davidepastore/slim-validation' => array(
+            'pretty_version' => 'v0.5.1',
+            'version' => '0.5.1.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../davidepastore/slim-validation',
+            'aliases' => array(),
+            'reference' => 'c28d6e2545dab51c9c4330d4db1dc55a75632f56',
             'dev_requirement' => false,
         ),
         'doctrine/inflector' => array(
@@ -26,6 +35,15 @@
             'install_path' => __DIR__ . '/../doctrine/inflector',
             'aliases' => array(),
             'reference' => '8b7ff3e4b7de6b2c84da85637b59fd2880ecaa89',
+            'dev_requirement' => false,
+        ),
+        'firebase/php-jwt' => array(
+            'pretty_version' => 'v6.1.0',
+            'version' => '6.1.0.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../firebase/php-jwt',
+            'aliases' => array(),
+            'reference' => 'fbb2967a3a68b07e37678c00c0cf51165051495f',
             'dev_requirement' => false,
         ),
         'illuminate/collections' => array(
@@ -169,8 +187,8 @@
         'psr/log-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '1.0|2.0',
-                1 => '1.0.0 || 2.0.0 || 3.0.0',
+                0 => '1.0.0 || 2.0.0 || 3.0.0',
+                1 => '1.0|2.0',
             ),
         ),
         'psr/simple-cache' => array(
@@ -189,6 +207,15 @@
             'install_path' => __DIR__ . '/../ramsey/uuid',
             'aliases' => array(),
             'reference' => 'ffa80ab953edd85d5b6c004f96181a538aad35a3',
+            'dev_requirement' => false,
+        ),
+        'respect/validation' => array(
+            'pretty_version' => '1.1.31',
+            'version' => '1.1.31.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../respect/validation',
+            'aliases' => array(),
+            'reference' => '45d109fc830644fecc1145200d6351ce4f2769d0',
             'dev_requirement' => false,
         ),
         'rhumsaa/uuid' => array(
