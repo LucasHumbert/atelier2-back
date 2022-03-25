@@ -39,7 +39,7 @@ class EventController
             $events = Event::all()->where('creator_id', '=', $token->upr->id)->makeHidden(['id', 'creator_id'])->toArray();;
             return Writer::jsonOutput($response, 200, ['events' => $events]);
         }
-        $events = Event::all()->where('public', '=', true)->makeHidden(['id', 'creator_id'])->toArray();
+        $events = Event::all()->where('public', '=', true)->makeHidden(['creator_id'])->toArray();
         return Writer::jsonOutput($response, 200, ['events' => $events]);
     }
 
