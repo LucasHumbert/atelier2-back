@@ -49,6 +49,7 @@ $app->delete('/events/{id}[/]', EventController::class . ':deleteEvent')->add(Ch
 
 //User routes
 $app->get('/users[/]', UserController::class . ':getUsers')->add(CheckToken::class . ':checkLevel');
+$app->get('/users/{id}[/]', UserController::class . ':getUser')->add(CheckToken::class . ':checkLevel');
 $app->delete('/users/{id}[/]', UserController::class . ':deleteUser')->add(CheckToken::class . ':checkLevel');
 
 $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function($req, $res) {
