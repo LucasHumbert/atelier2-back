@@ -30,7 +30,7 @@ class UserController
     public function getUsersEvents(Request $request, Response $response, $args)
     {
         try {
-            $tokenstring = $args['token'];
+            $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
             $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
         }
         catch (\Exception $e){
