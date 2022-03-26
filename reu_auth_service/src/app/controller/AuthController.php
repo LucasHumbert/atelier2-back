@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: canals5
- * Date: 18/11/2019
- * Time: 15:27
- */
 
 namespace reu\auth\app\controller;
 
@@ -15,35 +9,56 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Firebase\JWT\SignatureInvalidException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use reu\auth\app\model\User;
-use reu\auth\app\utils\Writer;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use reu\auth\app\model\User;
+use reu\auth\app\utils\Writer;
 use Slim\Container;
 
-
 /**
- * Class LBSAuthController
- * @package lbs\command\api\controller
+ * Class AuthController
+ *
+ * @author HUMBERT Lucas
+ * @author BUDZIK Valentin
+ * @author HOUQUES Baptiste
+ * @author LAMBERT Calvin
+ * @package reu\auth\app\controller
+ *
  */
 class AuthController
 {
 
     private $c;
 
+    /**
+     * Constructeur
+     *
+     * Permet au controller de pouvoir récupérer le conteneur.
+     *
+     * @param Container $c
+     */
     public function __construct(Container $c)
     {
         $this->c = $c;
     }
 
+    /**
+     * Function permettant au utilisateur de se connecter
+     *
+     * La fonction récupère les données envoyés dans la requête via la méthodes POST afin de les vérifier et de creer un nouvelle utilisateur qui sera ajouter à la DB
+     *
+     * @param Request $rq
+     * @param Response $rs
+     * @return Response Renvoie l'utilisateur précédemment crée.
+     */
     public function signup(Request $rq, Response $rs): Response
     {
         $bodyParam = $rq->getParsedBody();
-        if(empty($bodyParam)){
+        if (empty($bodyParam)) {
             return Writer::jsonOutput($rs, 204);
         } else {
-            if(isset($bodyParam['firstname'], $bodyParam['lastname'], $bodyParam['mail'], $bodyParam['password'], $bodyParam['confirmpassword'])){
-                if($bodyParam['password'] === $bodyParam['confirmpassword']) {
+            if (isset($bodyParam['firstname'], $bodyParam['lastname'], $bodyParam['mail'], $bodyParam['password'], $bodyParam['confirmpassword'])) {
+                if ($bodyParam['password'] === $bodyParam['confirmpassword']) {
                     $user = new User();
                     $password = password_hash($bodyParam['password'], PASSWORD_DEFAULT);
                     $firstname = filter_var($bodyParam['firstname'], FILTER_SANITIZE_STRING);
@@ -65,7 +80,16 @@ class AuthController
         return Writer::jsonOutput($rs, 201, ['user' => $user]);
     }
 
-
+    /**
+     * Fonction de vérification du token.
+     *
+     * Dans cette fonction on récupère le token dans le header afin de le décoder via le secret et de vérifier l'authenticiée des info du token
+     *
+     * @param Request $rq
+     * @param Response $rs
+     * @param $args
+     * @return Response Retourne le profil stocké dans le token.
+     */
     public function checkToken(Request $rq, Response $rs, $args): Response
     {
         if (!$rq->hasHeader('Authorization')) {
@@ -87,6 +111,19 @@ class AuthController
         return $rs;
     }
 
+    /**
+     * Fonction d'authentification des utilisateurs.
+     *
+     * Cette fonction récupère dans le header de la rêquetes Authorization Basic où sont présent les informations de connexions de l'utilisateur c'est à dire
+     * son mot de passe ainsi que son adresse mail. Il cherche l'utilisateur associé à l'adresse et compare le mot de passe avec celui hashé dans la base.
+     * Si l'adresse et le mot de passe correspondent on créer et on renvoie le token à l'utilisateur.
+     *
+     * @param Request $rq
+     * @param Response $rs
+     * @param $args
+     * @return Response
+     * @throws \Exception Invoqué lorsque le mot de passe ne correspond pas avec celui présent en base de donnée.
+     */
     public function authenticate(Request $rq, Response $rs, $args): Response
     {
 

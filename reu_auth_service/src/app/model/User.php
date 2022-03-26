@@ -4,6 +4,16 @@ namespace reu\auth\app\model;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class User
+ *
+ * @author HUMBERT Lucas
+ * @author BUDZIK Valentin
+ * @author HOUQUES Baptiste
+ * @author LAMBERT Calvin
+ * @package reu\auth\app\model
+ *
+ */
 class User extends Model
 {
     protected $table = 'user';
