@@ -53,12 +53,14 @@ $app->options('/{routes:.+}', function ($request, $response, $args) {
 //add user_id to return all events created by specific user
 $app->get('/events[/]', EventController::class . ':getEvents');
 $app->get('/events/{id}[/]', EventController::class . ':getEvent');
-$app->get('/events/{id}/messages[/]', EventController::class . ':getEventMessages');
 $app->get('/events/{id}/users[/]', EventController::class . ':getEventUsers');
 $app->post('/events[/]', EventController::class . ':postEvent')
     ->add(new Validation($postEventValidators));
 $app->post('/events/{event_id}/users[/]', EventController::class . ':postChoice');
 $app->put('/events/{event_id}/users[/]', EventController::class . ':putChoice');
+
+$app->get('/events/{id}/messages[/]', EventController::class . ':getEventMessages');
+$app->post('/events/{eventId}/message[/]', EventController::class . ':postMessage');
 
 //Users routes
 $app->get('/users[/]', UserController::class . ':getUsers');

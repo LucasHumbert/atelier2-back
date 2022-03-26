@@ -7,6 +7,7 @@ use Firebase\JWT\Key;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use reu\event\app\model\Event;
 use reu\event\app\model\Guest;
+use reu\event\app\model\Message;
 use reu\event\app\model\User;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -167,7 +168,11 @@ class EventController
             $messages[] = ['user_id' => $message->pivot->user_id,
                 'event_id' => $message->pivot->event_id,
                 'content' => $message->pivot->content,
-                'date' => $message->pivot->date
+                'date' => $message->pivot->date,
+                'user' => [
+                    'firstname' => $message->firstname,
+                    'lastname' => $message->lastname,
+                ]
             ];
         }
 
@@ -225,7 +230,7 @@ class EventController
             $event->title = filter_var($pars['title'],FILTER_SANITIZE_STRING);
             $event->description = filter_var($pars['description'],FILTER_SANITIZE_STRING);
             $date = strtotime(filter_var($pars['date'], FILTER_SANITIZE_STRING));
-            $event->date = date('y-m-d h:i:s', $date);
+            $event->date = date('y-m-d H:i:s', $date);
             $event->address = filter_var($pars['address'],FILTER_SANITIZE_STRING);
             $event->lat = $pars['lat'];
             $event->lon = $pars['lon'];
@@ -249,7 +254,8 @@ class EventController
         $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
         $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
 
-
+        $user = User::with('events')->find($token->upr->id);
+        $user->events()->attach($args['event_id'],['choice'=> $pars['choice']]);
 
         return Writer::jsonOutput($response, 200, ['message' => 'created']);
     }
@@ -262,6 +268,19 @@ class EventController
 
         $user = User::with('events')->find($token->upr->id);
         $user->events()->updateExistingPivot($args['event_id'],array('choice' => $pars['choice']),false);
+
+        return Writer::jsonOutput($response, 200, ['message' => 'created']);
+    }
+
+    public function postMessage (Request $request, Response $response, $args): Response
+    {
+        $pars = $request->getParsedBody();
+
+        $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
+        $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
+
+        $user = User::with('messages')->find($token->upr->id);
+        $user->messages()->attach($args['eventId'],['content'=> $pars['content'], 'date' => date('y-m-d H:i:s')]);
 
         return Writer::jsonOutput($response, 200, ['message' => 'created']);
     }
