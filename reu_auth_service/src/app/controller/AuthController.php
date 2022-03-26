@@ -15,6 +15,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Firebase\JWT\SignatureInvalidException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Ramsey\Uuid\Uuid;
 use reu\auth\app\model\User;
 use reu\auth\app\utils\Writer;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -45,6 +46,7 @@ class AuthController
             if(isset($bodyParam['firstname'], $bodyParam['lastname'], $bodyParam['mail'], $bodyParam['password'], $bodyParam['confirmpassword'])){
                 if($bodyParam['password'] === $bodyParam['confirmpassword']) {
                     $user = new User();
+                    $user->id = Uuid::uuid4();
                     $password = password_hash($bodyParam['password'], PASSWORD_DEFAULT);
                     $firstname = filter_var($bodyParam['firstname'], FILTER_SANITIZE_STRING);
                     $lastname = filter_var($bodyParam['lastname'], FILTER_SANITIZE_STRING);

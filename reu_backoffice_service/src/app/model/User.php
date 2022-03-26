@@ -8,7 +8,7 @@ class User extends Model
 {
     protected $primaryKey = 'id';
     protected $table = 'user';
-    public $incrementing = true;
+    public $incrementing = false;
     public $timestamps = false;
 
     public function events()
