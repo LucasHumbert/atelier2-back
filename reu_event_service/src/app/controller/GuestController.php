@@ -11,6 +11,17 @@ use reu\event\app\model\Guest;
 use reu\event\app\utils\Writer;
 use Slim\Container;
 
+/**
+ * Class GuestController
+ *
+ * @author HUMBERT Lucas
+ * @author BUDZIK Valentin
+ * @author HOUQUES Baptiste
+ * @author LAMBERT Calvin
+ * @package reu\event\app\controller
+ *
+ */
+
 class GuestController
 {
     private $c;

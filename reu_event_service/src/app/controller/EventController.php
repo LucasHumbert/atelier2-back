@@ -14,6 +14,16 @@ use reu\event\app\utils\Writer;
 use Ramsey\Uuid\Uuid;
 use Slim\Container;
 
+/**
+ * Class EventController
+ *
+ * @author HUMBERT Lucas
+ * @author BUDZIK Valentin
+ * @author HOUQUES Baptiste
+ * @author LAMBERT Calvin
+ * @package reu\event\app\controller
+ *
+ */
 
 class EventController
 {
@@ -23,6 +33,17 @@ class EventController
     {
         $this->c = $c;
     }
+
+    /**
+     *  Fonction de récupération des événements
+     *
+     * Cette fonction récupère dans la base de données tous les événements à partir d'une requête.
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
 
     public function getEvents(Request $request, Response $response, $args): Response
     {
@@ -43,6 +64,19 @@ class EventController
         return Writer::jsonOutput($response, 200, ['events' => $events]);
     }
 
+    /**
+     * Fonction de récupération d'un événement
+     *
+     * Cette fonction permet de récuperer un événement afin de fournir les informations lié à cet événement.
+     * Si la requête contient un paramêtre embed, on peut obtenir des informations supplémentaires concernant
+     * les messages, les utilisateurs lié à l'événement, ...
+     *
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
     public function getEvent(Request $request, Response $response, $args): Response
     {
         //Try to find event
@@ -157,6 +191,17 @@ class EventController
         return Writer::jsonOutput($response, 200, $data);
     }
 
+    /**
+     * Fonction de récupération des messages lié à un événement
+     *
+     * A renseigner
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
+
     public function getEventMessages(Request $request, Response $response, $args): Response
     {
         $event = Event::with('messages')
@@ -182,6 +227,17 @@ class EventController
         return $response;
     }
 
+    /**
+     * Fonction de récupération des messages lié à un utilisateur
+     *
+     * A renseigner
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
+
     public function getEventUsers(Request $request, Response $response, $args): Response
     {
         $event = Event::with('users')
@@ -206,6 +262,18 @@ class EventController
         $response->getBody()->write(json_encode($data));
         return $response;
     }
+
+    /**
+     * Fonction de création d'un événement
+     *
+     * Cette fonction permet de créer un événement en s'assurant au préalable que tous les champs sont bien
+     * renseigner et en appliquant des filtres sur ces derniers.
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
 
     public function postEvent (Request $request, Response $response, $args): Response
     {
@@ -241,7 +309,21 @@ class EventController
         }
         return Writer::jsonOutput($response, 200, ['event' => $event]);
     }
-
+    /**
+     * Fonction d'envoi du choix d'un utilisateur à un événement
+     *
+     * Cette fonction permet de renseigner dans la base de donnée le choix de l'utilisateur à un événement,
+     * si il participera ou non à l'événement. Cette fonction est utilisable uniquement si c'est la première fois
+     * que l'utilisateur souhaite faire son choix
+     *
+     *
+     * A renseigner
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
     public function postChoice (Request $request, Response $response, $args): Response
     {
         $pars = $request->getParsedBody();
@@ -253,6 +335,21 @@ class EventController
 
         return Writer::jsonOutput($response, 200, ['message' => 'created']);
     }
+
+    /**
+     * Fonction d'envoi du changement de choix déjà renseigné d'un utilisateur à un événement
+     *
+     * Cette fonction permet de renseigner dans la base de donnée le choix de l'utilisateur à un événement,
+     * si il participera ou non à l'événement. Cette fonction modifie le choix de l'utilisateur
+     *
+     * A renseigner
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
+
     public function putChoice (Request $request, Response $response, $args): Response
     {
         $pars = $request->getParsedBody();

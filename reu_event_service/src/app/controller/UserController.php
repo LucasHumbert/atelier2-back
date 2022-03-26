@@ -12,6 +12,17 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use reu\event\app\utils\Writer;
 use Slim\Container;
 
+/**
+ * Class UserController
+ *
+ * @author HUMBERT Lucas
+ * @author BUDZIK Valentin
+ * @author HOUQUES Baptiste
+ * @author LAMBERT Calvin
+ * @package reu\event\app\controller
+ *
+ */
+
 class UserController
 {
     private $c;
