@@ -100,7 +100,7 @@ class EventController
                             return Writer::jsonOutput($response, 200, ['event' => $event,'userConnected' => ['firstname' => $token->upr->firstname,'lastname' => $token->upr->lastname],'inEvent' => true,'choice' => $userEvent->pivot->choice]);
                         }
                     }
-                    return Writer::jsonOutput($response, 200, ['event' => $event,'userConnected' => ['firstname' => $token->upr->firstname,'lastname' => $token->upr->lastname],'inEvent' => $test]);
+                    return Writer::jsonOutput($response, 200, ['event' => $event,'userConnected' => ['firstname' => $token->upr->firstname,'lastname' => $token->upr->lastname],'inEvent' => false]);
                 }
                 catch (\Exception $e){
                     return Writer::jsonOutput($response, $e->getCode(), ['message => $e']);
