@@ -20,7 +20,7 @@ class User extends Model
 
     public function messages()
     {
-        return $this->belongsToMany(User::class, 'messages', 'user_id', 'event_id')
+        return $this->belongsToMany(User::class, 'message', 'user_id', 'event_id')
             ->withPivot(['user_id', 'event_id', 'content', 'date']);
     }
 }
