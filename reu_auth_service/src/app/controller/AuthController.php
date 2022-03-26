@@ -139,7 +139,8 @@ class AuthController
         $user->save();
         $data = [
             'accessToken' => $token,
-            'refreshToken' => $user->refresh_token
+            'refreshToken' => $user->refresh_token,
+            'user_id' => $user->id
         ];
 
         return Writer::jsonOutput($rs, 200, $data);
