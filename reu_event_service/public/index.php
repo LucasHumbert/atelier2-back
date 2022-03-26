@@ -62,7 +62,7 @@ $app->put('/events/{event_id}/users[/]', EventController::class . ':putChoice');
 
 //Users routes
 $app->get('/users[/]', UserController::class . ':getUsers');
-$app->get('/users/{token}/events', UserController::class . ':getUsersEvents');
+$app->get('/users/{id}/events[/]', UserController::class . ':getUsersEvents');
 
 //Guests routes
 $app->get('/guests/{idEvent}[/]', GuestController::class . ':getGuests');

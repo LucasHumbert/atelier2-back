@@ -331,7 +331,8 @@ class EventController
         $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
         $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
 
-
+        $user = User::with('events')->find($token->upr->id);
+        $user->events()->attach($args['event_id'],['choice'=> $pars['choice']]);
 
         return Writer::jsonOutput($response, 200, ['message' => 'created']);
     }

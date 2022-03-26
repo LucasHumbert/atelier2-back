@@ -43,20 +43,22 @@ class UserController
         try {
             $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
             $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
+            if($token->upr->id !== $args['id']){
+                return Writer::jsonOutput($response, 401, ['error' => 'Unauthorized']);
+            }
         }
         catch (\Exception $e){
             return Writer::jsonOutput($response, 403, ['message' => $e]);
         }
         try {
             $user = User::with('events')
-                ->where('id','=',$token->upr->id)
+                ->where('id','=',$args['id'])
                 ->first();
             $res = [];
             foreach($user->events as $event_utilisateur){
                 $event = Event::find($event_utilisateur->pivot->event_id);
                 $res[] = $event;
             }
-
 
         } catch (ModelNotFoundException $e) {
 
