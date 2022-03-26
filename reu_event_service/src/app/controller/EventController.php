@@ -94,13 +94,13 @@ class EventController
                 $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
                 $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
                 try {
-                    $event = Event::with('users')->first();
+                    $event = Event::with('users')->find($args['id']);
                     foreach ($event->users as $userEvent) {
                         if($userEvent->pivot->user_id === $token->upr->id){
                             return Writer::jsonOutput($response, 200, ['event' => $event,'userConnected' => ['firstname' => $token->upr->firstname,'lastname' => $token->upr->lastname],'inEvent' => true,'choice' => $userEvent->pivot->choice]);
                         }
                     }
-                    return Writer::jsonOutput($response, 200, ['event' => $event,'userConnected' => ['firstname' => $token->upr->firstname,'lastname' => $token->upr->lastname],'inEvent' => false]);
+                    return Writer::jsonOutput($response, 200, ['event' => $event,'userConnected' => ['firstname' => $token->upr->firstname,'lastname' => $token->upr->lastname],'inEvent' => $test]);
                 }
                 catch (\Exception $e){
                     return Writer::jsonOutput($response, $e->getCode(), ['message => $e']);
@@ -249,8 +249,7 @@ class EventController
         $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
         $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
 
-        $user = User::with('events')->find($token->upr->id);
-        $user->events()->attach($args['event_id'],['choice'=> $pars['choice']]);
+
 
         return Writer::jsonOutput($response, 200, ['message' => 'created']);
     }
