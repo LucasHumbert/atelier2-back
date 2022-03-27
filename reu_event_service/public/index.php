@@ -63,8 +63,9 @@ $app->get('/events/{id}/messages[/]', EventController::class . ':getEventMessage
 $app->post('/events/{eventId}/message[/]', EventController::class . ':postMessage');
 
 //Users routes
-$app->get('/users[/]', UserController::class . ':getUsers');
+$app->get('/users/{id}', UserController::class . ':getUser');
 $app->get('/users/{id}/events[/]', UserController::class . ':getUsersEvents');
+$app->put('/users/{id}', UserController::class . ':putUser');
 
 //Guests routes
 $app->get('/guests/{idEvent}[/]', GuestController::class . ':getGuests');
