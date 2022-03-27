@@ -97,6 +97,7 @@ class UserController
             $res = [];
             foreach($user->events as $event_utilisateur){
                 $event = Event::find($event_utilisateur->pivot->event_id);
+                $event['choice'] = $event_utilisateur->pivot->choice;
                 $res[] = $event;
             }
 
