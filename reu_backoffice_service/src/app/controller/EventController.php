@@ -4,6 +4,7 @@ namespace reu\backoffice\app\controller;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use reu\backoffice\app\model\Event;
+use reu\backoffice\app\model\Guest;
 use reu\backoffice\app\model\User;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -182,6 +183,11 @@ class EventController
     {
         $event = Event::find($args['id']);
         $event->messages()->wherePivot('event_id', '=', $args['id'])->detach();
+        $event->users()->wherePivot('event_id', '=', $args['id'])->detach();
+        $guests = Guest::where('event_id', '=', $args['id'])->get();
+        foreach ($guests as $guest) {
+            $guest->delete();
+        }
         $event->delete();
 
         $response = $response->withHeader('Content-Type', 'application/json;charset=utf-8');

@@ -48,16 +48,19 @@ class EventController
     public function getEvents(Request $request, Response $response): Response
     {
         $queryparam = $request->getQueryParams();
-        if (!empty($queryparam) && in_array('creator_id', $queryparam['filter'])) {
-            $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
+        if (!empty($queryparam) && isset($queryparam['creator_id'])) {
             try {
+                $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
                 $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
+                if($token->upr->id !== $queryparam['creator_id']){
+                    return Writer::jsonOutput($response, 401, ['error' => 'Unauthorized']);
+                }
             }
             catch (\Exception $e){
                 return Writer::jsonOutput($response, 403, ['message' => $e]);
             }
 
-            $events = Event::where('creator_id', '=', $token->upr->id)->get()->makeHidden(['id', 'creator_id']);
+            $events = Event::where('creator_id', '=', $queryparam['creator_id'])->get();
             return Writer::jsonOutput($response, 200, ['events' => $events]);
         }
         $events = Event::where('public', '=', true)->get()->makeHidden(['creator_id']);
@@ -393,5 +396,38 @@ class EventController
         $user->messages()->attach($args['eventId'],['content'=> $pars['content'], 'date' => date('y-m-d H:i:s')]);
 
         return Writer::jsonOutput($response, 200, ['message' => 'created']);
+    }
+
+    public function deleteEvent(Request $request, Response $response, $args): Response
+    {
+        if (!isset($request->getHeader('Authorization')[0])){
+            return Writer::jsonOutput($response, 401, ['error' => 'Unauthorized']);
+        }
+        try {
+            $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
+            $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
+        }
+        catch (\Exception $e){
+            return Writer::jsonOutput($response, 403, ['message' => $e]);
+        }
+        $event = Event::find($args['id']);
+
+        //Verify if authorization token comes from the same user as the creator of the event
+        if($token->upr->id != $event->creator_id){
+            return Writer::jsonOutput($response, 401, ['error' => 'Unauthorized']);
+        }
+
+        $event->messages()->wherePivot('event_id', '=', $args['id'])->detach();
+        $event->users()->wherePivot('event_id', '=', $args['id'])->detach();
+        $guests = Guest::where('event_id', '=', $args['id'])->get();
+        foreach ($guests as $guest) {
+            $guest->delete();
+        }
+        $event->delete();
+
+        $response = $response->withHeader('Content-Type', 'application/json;charset=utf-8');
+        $response->getBody()->write(json_encode(['response' => 'Event deleted']));
+
+        return Writer::jsonOutput($response, 200, ['message' => 'deleted']);
     }
 }
