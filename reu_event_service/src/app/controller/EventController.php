@@ -36,17 +36,16 @@ class EventController
     }
 
     /**
-     *  Fonction de récupération des événements
+     * Fonction de récupération des événements
      *
      * Cette fonction récupère dans la base de données tous les événements à partir d'une requête.
      *
      * @param Request $request
      * @param Response $response
-     * @param $args
      * @return Response
      */
 
-    public function getEvents(Request $request, Response $response, $args): Response
+    public function getEvents(Request $request, Response $response): Response
     {
         $queryparam = $request->getQueryParams();
         if (!empty($queryparam) && in_array('creator_id', $queryparam['filter'])) {
@@ -195,7 +194,9 @@ class EventController
     /**
      * Fonction de récupération des messages lié à un événement
      *
-     * A renseigner
+     * La fonction permet, en transmettant l'identifiant de l'événement, de récupérer tous les messages qui lui
+     * sont associés. La réponse contient l'id de l'événement, le contenu, la date du message et l'id, le prénom
+     * et le nom de l'utilisateur ayant posté le message.
      *
      * @param Request $request
      * @param Response $response
@@ -276,11 +277,10 @@ class EventController
      *
      * @param Request $request
      * @param Response $response
-     * @param $args
      * @return Response
      */
 
-    public function postEvent (Request $request, Response $response, $args): Response
+    public function postEvent (Request $request, Response $response): Response
     {
         $pars = $request->getParsedBody();
         $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
@@ -355,7 +355,6 @@ class EventController
      * @param $args
      * @return Response
      */
-
     public function putChoice (Request $request, Response $response, $args): Response
     {
         $pars = $request->getParsedBody();
@@ -369,6 +368,20 @@ class EventController
         return Writer::jsonOutput($response, 200, ['message' => 'created']);
     }
 
+    /**
+     * Fonction permettant de poster un message sur un événement
+     *
+     * Cette fonction permet de renseigner dans la base de donnée un message envoyé par un utilisateur dans un
+     * événement donné. Un message pouvant être envoyé seulement par un utilisateur connecté, on regarde dans le token envoyé
+     * pour connaitre l'id de l'auteur du message.
+     *
+     * A renseigner
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
     public function postMessage (Request $request, Response $response, $args): Response
     {
         $pars = $request->getParsedBody();
