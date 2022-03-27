@@ -312,6 +312,9 @@ class EventController
             }
             $event->save();
 
+            $user = User::with('events')->find($token->upr->id);
+            $user->events()->attach($event->id,['choice'=> 1]);
+
         } catch (\Exception $e) {
             return Writer::jsonOutput($response, 200, ['message' => $e]);
         }
