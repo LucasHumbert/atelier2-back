@@ -434,4 +434,16 @@ class EventController
 
         return Writer::jsonOutput($response, 200, ['message' => 'deleted']);
     }
+
+    public function postInvitation(Request $request, Response $response, $args): Response {
+        $pars = $request->getParsedBody();
+        $user = User::where('mail', '=', $pars['mail'])->first();
+
+        if (isset($user)){
+            $user->events()->attach($args['eventId'],['choice'=> 2]);
+            return Writer::jsonOutput($response, 200, ['message' => 'User invited', 'user' => ['user_id'=> $user->id,'firstname' => $user->firstname, 'lastname' => $user->lastname, 'mail' => $user->mail]]);
+        } else {
+            return Writer::jsonOutput($response, 401, ['error' => 'Inexistant user']);
+        }
+    }
 }
