@@ -49,7 +49,7 @@ class EventController
     {
         $queryparam = $request->getQueryParams();
         if (!empty($queryparam) && in_array('creator_id', $queryparam['filter'])) {
-            $tokenstring = $queryparam['creator_token'];
+            $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
             try {
                 $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
             }
