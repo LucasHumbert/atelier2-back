@@ -1,6 +1,6 @@
 <?php
 
-namespace reu\event\app\model;
+namespace reu\backoffice\app\model;
 
 use Illuminate\Database\Eloquent\Model;
 

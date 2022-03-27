@@ -58,7 +58,7 @@ $app->post('/events[/]', EventController::class . ':postEvent')
     ->add(new Validation($postEventValidators));
 $app->post('/events/{event_id}/users[/]', EventController::class . ':postChoice');
 $app->put('/events/{event_id}/users[/]', EventController::class . ':putChoice');
-
+$app->delete('/events/{id}', EventController::class . ':deleteEvent');
 $app->get('/events/{id}/messages[/]', EventController::class . ':getEventMessages');
 $app->post('/events/{eventId}/message[/]', EventController::class . ':postMessage');
 
