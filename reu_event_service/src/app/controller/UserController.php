@@ -32,10 +32,50 @@ class UserController
         $this->c = $c;
     }
 
-    public function getUsers(Request $request, Response $response)
+    public function getUser(Request $request, Response $response, $args): Response
     {
-        $users = User::all();
-        return Writer::jsonOutput($response, 200, [$users]);
+        try {
+            $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
+            $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
+            if($token->upr->id !== $args['id']){
+                return Writer::jsonOutput($response, 401, ['error' => 'Unauthorized']);
+            }
+        }
+        catch (\Exception $e){
+            return Writer::jsonOutput($response, 403, ['message' => $e]);
+        }
+        try {
+            $user = User::find($args['id'],['firstname', 'lastname']);
+        }
+        catch (ModelNotFoundException $e) {
+            return Writer::jsonOutput($response, 404, ['message' => 'Utilisateur introuvable']);
+        }
+        return Writer::jsonOutput($response, 200, ['user' => $user]);
+    }
+
+    public function putUser(Request $request, Response $response, $args): Response
+    {
+        try {
+            $pars = $request->getParsedBody();
+            $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
+            $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
+            if($token->upr->id !== $args['id']){
+                return Writer::jsonOutput($response, 401, ['error' => 'Unauthorized']);
+            }
+        }
+        catch (\Exception $e){
+            return Writer::jsonOutput($response, 403, ['message' => $e]);
+        }
+        try {
+            $user = User::find($args['id']);
+            $user->firstname = filter_var($pars['firstname'],FILTER_SANITIZE_STRING);
+            $user->lastname = filter_var($pars['lastname'],FILTER_SANITIZE_STRING);
+            $user->save();
+        }
+        catch (\Exception $e) {
+            return Writer::jsonOutput($response, $e->getCode(), ['message' => $e]);
+        }
+        return Writer::jsonOutput($response, 200, ['message' => 'User updated']);
     }
 
     public function getUsersEvents(Request $request, Response $response, $args)
