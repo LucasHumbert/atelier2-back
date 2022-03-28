@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '780a508be9de1a8c3153990eea25aecaa953f499',
+        'reference' => '805acc8433bf6ea91d5f99d2f1d9420924dc3d97',
         'name' => '__root__',
         'dev' => true,
     ),
@@ -16,7 +16,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '780a508be9de1a8c3153990eea25aecaa953f499',
+            'reference' => '805acc8433bf6ea91d5f99d2f1d9420924dc3d97',
             'dev_requirement' => false,
         ),
         'davidepastore/slim-validation' => array(

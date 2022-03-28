@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '930774b736c2e16aad9bb56f55ddaf585e234fa7',
+        'reference' => '805acc8433bf6ea91d5f99d2f1d9420924dc3d97',
         'name' => '__root__',
         'dev' => true,
     ),
@@ -16,7 +16,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '930774b736c2e16aad9bb56f55ddaf585e234fa7',
+            'reference' => '805acc8433bf6ea91d5f99d2f1d9420924dc3d97',
             'dev_requirement' => false,
         ),
         'doctrine/inflector' => array(
@@ -29,12 +29,12 @@
             'dev_requirement' => false,
         ),
         'firebase/php-jwt' => array(
-            'pretty_version' => 'v6.0.0',
-            'version' => '6.0.0.0',
+            'pretty_version' => 'v6.1.0',
+            'version' => '6.1.0.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../firebase/php-jwt',
             'aliases' => array(),
-            'reference' => '0541cba75ab108ef901985e68055a92646c73534',
+            'reference' => 'fbb2967a3a68b07e37678c00c0cf51165051495f',
             'dev_requirement' => false,
         ),
         'illuminate/collections' => array(
@@ -118,6 +118,15 @@
             'reference' => '181d480e08d9476e61381e04a71b34dc0432e812',
             'dev_requirement' => false,
         ),
+        'paragonie/random_compat' => array(
+            'pretty_version' => 'v9.99.100',
+            'version' => '9.99.100.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../paragonie/random_compat',
+            'aliases' => array(),
+            'reference' => '996434e5492cb4c3edcb9168db6fbb1359ef965a',
+            'dev_requirement' => false,
+        ),
         'pimple/pimple' => array(
             'pretty_version' => 'v3.5.0',
             'version' => '3.5.0.0',
@@ -169,8 +178,8 @@
         'psr/log-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '1.0|2.0',
-                1 => '1.0.0 || 2.0.0 || 3.0.0',
+                0 => '1.0.0 || 2.0.0 || 3.0.0',
+                1 => '1.0|2.0',
             ),
         ),
         'psr/simple-cache' => array(
@@ -181,6 +190,21 @@
             'aliases' => array(),
             'reference' => '408d5eafb83c57f6365a3ca330ff23aa4a5fa39b',
             'dev_requirement' => false,
+        ),
+        'ramsey/uuid' => array(
+            'pretty_version' => '3.9.6',
+            'version' => '3.9.6.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../ramsey/uuid',
+            'aliases' => array(),
+            'reference' => 'ffa80ab953edd85d5b6c004f96181a538aad35a3',
+            'dev_requirement' => false,
+        ),
+        'rhumsaa/uuid' => array(
+            'dev_requirement' => false,
+            'replaced' => array(
+                0 => '3.9.6',
+            ),
         ),
         'slim/slim' => array(
             'pretty_version' => '3.12.3',

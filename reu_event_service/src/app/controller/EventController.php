@@ -89,6 +89,12 @@ class EventController
             $creatorUser = User::find($event->creator_id, ['firstname', 'lastname', 'mail']);
             $event->creatorUser = $creatorUser;
 
+            if (strtotime(date("Y-m-d H:i:s")) - (strtotime($event->date)) > 1) {
+                $event->done = true;
+            } else {
+                $event->done = false;
+            }
+
         } catch (ModelNotFoundException $e) {
             $response = $response->withStatus(404)->withHeader('Content-Type', 'application/json');
             $response->getBody()->write(json_encode([
@@ -302,7 +308,7 @@ class EventController
             $event->description = $pars['description'];
             $date = strtotime(filter_var($pars['date'], FILTER_SANITIZE_STRING));
             $event->date = date('y-m-d H:i:s', $date);
-            $event->address = filter_var($pars['address'],FILTER_SANITIZE_STRING);
+            $event->address = $pars['address'];
             $event->lat = $pars['lat'];
             $event->lon = $pars['lon'];
             if($pars['public'] == "true"){
