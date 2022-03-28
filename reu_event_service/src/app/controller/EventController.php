@@ -112,9 +112,12 @@ class EventController
             if (isset($queryparam['embed']) && in_array('messages', $queryparam['embed'])) {
                 $messages = [];
                 foreach($event->messages as $message) {
+                    $user = User::find($message->pivot->user_id);
                     $messages[] = ['user_id' => $message->pivot->user_id,
                         'content' => $message->pivot->content,
-                        'date' => $message->pivot->date
+                        'date' => $message->pivot->date,
+                        'user_firstname' => $user->firstname,
+                        'user_lastname' => $user->lastname
                     ];
                 }
             }
