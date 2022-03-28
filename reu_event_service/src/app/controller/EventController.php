@@ -298,8 +298,8 @@ class EventController
             $event =  new Event;
             $event->id =  Uuid::uuid4();
             $event->creator_id = $token->upr->id;
-            $event->title = filter_var($pars['title'],FILTER_SANITIZE_STRING);
-            $event->description = filter_var($pars['description'],FILTER_SANITIZE_STRING);
+            $event->title = $pars['title'];
+            $event->description = $pars['description'];
             $date = strtotime(filter_var($pars['date'], FILTER_SANITIZE_STRING));
             $event->date = date('y-m-d H:i:s', $date);
             $event->address = filter_var($pars['address'],FILTER_SANITIZE_STRING);
