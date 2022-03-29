@@ -38,13 +38,14 @@ class EventController
     /**
      * Fonction de récupération des événements
      *
-     * Cette fonction récupère dans la base de données tous les événements à partir d'une requête.
+     * Cette fonction retourne tous les événements publics.
+     *
+     * Si ajout du paramètre 'creator_id' dans l'uri de la requête : la réponse retourne tous les évènements liés à l'utilisateur correspondant à cet id
      *
      * @param Request $request
      * @param Response $response
      * @return Response
      */
-
     public function getEvents(Request $request, Response $response): Response
     {
         $queryparam = $request->getQueryParams();
@@ -57,7 +58,7 @@ class EventController
                 }
             }
             catch (\Exception $e){
-                return Writer::jsonOutput($response, 403, ['message' => $e]);
+                return Writer::jsonOutput($response, 403, ['message' => $e->getMessage()]);
             }
 
             $events = Event::where('creator_id', '=', $queryparam['creator_id'])->get();
@@ -70,10 +71,13 @@ class EventController
     /**
      * Fonction de récupération d'un événement
      *
-     * Cette fonction permet de récuperer un événement afin de fournir les informations lié à cet événement.
-     * Si la requête contient un paramêtre embed, on peut obtenir des informations supplémentaires concernant
-     * les messages, les utilisateurs lié à l'événement, ...
+     * Cette fonction retourne un événement en fonction de l'id dans le paramètre de la route.
      *
+     * - Si la requête contient le paramêtre embed (de type array), la réponse retourne des informations supplémentaires sur
+     * les messages, les utilisateurs et/ou les guests liés à l'évènement.
+     *
+     * - Si la requête contient le paramêtre filter (de type array), la réponse retourne le choix de l'utilisateur (via son token de connexion)
+     * concernant l'évènement retourné.
      *
      * @param Request $request
      * @param Response $response
@@ -84,10 +88,9 @@ class EventController
     {
         //Try to find event
         try {
-            $event = Event::with('messages', 'users')
-                ->where('id', '=', $args['id'])->first();
+            $event = Event::where('id', '=', $args['id'])->first();
             $creatorUser = User::find($event->creator_id, ['firstname', 'lastname', 'mail']);
-            $event->creatorUser = $creatorUser;
+            $event->creatorUser = $creatorUser; //Add infos of the creator of the event
 
             if (strtotime(date("Y-m-d H:i:s")) - (strtotime($event->date)) > 1) {
                 $event->done = true;
@@ -135,7 +138,12 @@ class EventController
                 }
             }
 
-            //get user connected of the event
+            //get guests of the event
+            if (isset($queryparam['embed']) && in_array('guests', $queryparam['embed'])) {
+                $guests = Guest::all()->where('event_id', '=', $args['id']);
+            }
+
+            //get user connected information & choice of the event
             if (isset($queryparam['filter']) && in_array('userConnected', $queryparam['filter'])) {
                 $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
                 $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
@@ -149,16 +157,12 @@ class EventController
                     return Writer::jsonOutput($response, 200, ['event' => $event,'userConnected' => ['firstname' => $token->upr->firstname,'lastname' => $token->upr->lastname],'inEvent' => false]);
                 }
                 catch (\Exception $e){
-                    return Writer::jsonOutput($response, $e->getCode(), ['message => $e']);
+                    return Writer::jsonOutput($response, $e->getCode(), ['message' => $e->getMessage()]);
                 }
             }
 
-            if (isset($queryparam['embed']) && in_array('guests', $queryparam['embed'])) {
-                $guests = Guest::all()->where('event_id', '=', $args['id']);
-            }
-
             $data = ["type" => "ressource",
-                "event" => $event->makeHidden(['messages', 'users'])];
+                "event" => $event];
 
             //add users to the response
             if(isset($users)){
@@ -215,7 +219,6 @@ class EventController
      * @param $args
      * @return Response
      */
-
     public function getEventMessages(Request $request, Response $response, $args): Response
     {
         $event = Event::with('messages')
@@ -246,16 +249,16 @@ class EventController
     }
 
     /**
-     * Fonction de récupération des messages lié à un utilisateur
+     * Fonction de récupération des utilisateurs lié à un évènement
      *
-     * A renseigner
+     * La fonction permet, en transmettant l'identifiant de l'événement, de récupérer tous les utilisateurs qui lui
+     * sont associés. La réponse contient l'id de l'événement et les utilisateurs avec leur id, nom et prénom.
      *
      * @param Request $request
      * @param Response $response
      * @param $args
      * @return Response
      */
-
     public function getEventUsers(Request $request, Response $response, $args): Response
     {
         $event = Event::with('users')
@@ -291,12 +294,11 @@ class EventController
      * @param Response $response
      * @return Response
      */
-
     public function postEvent (Request $request, Response $response): Response
     {
         $pars = $request->getParsedBody();
-        $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
 
+        $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
         $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
 
         if (!isset($pars['title'], $pars['description'],$pars['date'],$pars['address'],$pars['lat'],$pars['lon'],$pars['public'])) {
@@ -320,42 +322,65 @@ class EventController
                 $event->public = 0;
             }
             $event->save();
-            $eventId = $event->id;
 
             $user = User::with('events')->find($token->upr->id);
             $user->events()->attach($event->id->toString(),['choice'=> 1]);
 
         } catch (\Exception $e) {
-            return Writer::jsonOutput($response, 200, ['message' => $e]);
+            return Writer::jsonOutput($response, 200, ['message' => $e->getMessage()]);
         }
         return Writer::jsonOutput($response, 200, ['event' => $event]);
     }
+
     /**
      * Fonction d'envoi du choix d'un utilisateur à un événement
      *
-     * Cette fonction permet de renseigner dans la base de donnée le choix de l'utilisateur à un événement,
-     * si il participera ou non à l'événement. Cette fonction est utilisable uniquement si c'est la première fois
-     * que l'utilisateur souhaite faire son choix
+     * Cette fonction permet de renseigner d'attacher un utilisateur à un événement en renseignant son choix.
+     * Cette fonction est utilisable uniquement si c'est la première foi que l'utilisateur souhaite faire son choix.
      *
-     *
-     * A renseigner
+     * Si le paramètre findUserBy est présent dans l'uri de la requête,
+     * L'attache de utilisateur à un évènement se fera via son email en renseignant son choix à 2 (indécis).
      *
      * @param Request $request
      * @param Response $response
      * @param $args
      * @return Response
      */
-    public function postChoice (Request $request, Response $response, $args): Response
+    public function postEventUser (Request $request, Response $response, $args): Response
     {
-        $pars = $request->getParsedBody();
+        //if the request contains 'embed' parameter
+        $queryparam = $request->getQueryParams();
+        if (!empty($queryparam)) {
+            //get messages of the event
+            if (isset($queryparam['findUserBy']) && in_array('email', $queryparam['findUserBy'])) {
+                $pars = $request->getParsedBody();
+                $user = User::where('mail', '=', $pars['mail'])->first();
 
-        $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
-        $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
+                if (isset($user)){
+                    try {
+                        $user->events()->attach($args['event_id'],['choice'=> 2]);
+                    }
+                    catch (\Exception $e) {
+                        return Writer::jsonOutput($response, 401, ['error' => 'User already in event']);
+                    }
+                    return Writer::jsonOutput($response, 200, ['message' => 'User invited', 'user' => ['user_id'=> $user->id,'firstname' => $user->firstname, 'lastname' => $user->lastname, 'mail' => $user->mail]]);
+                } else {
+                    return Writer::jsonOutput($response, 401, ['error' => 'Inexistant user']);
+                }
+            }
+        }
+        try{
+            $pars = $request->getParsedBody();
+            $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
+            $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
 
-        $user = User::with('events')->find($token->upr->id);
-        $user->events()->attach($args['event_id'],['choice'=> $pars['choice']]);
-
-        return Writer::jsonOutput($response, 200, ['message' => 'created']);
+            $user = User::with('events')->find($token->upr->id);
+            $user->events()->attach($args['event_id'],['choice'=> $pars['choice']]);
+        }
+        catch (\Exception $e) {
+            return Writer::jsonOutput($response, 400, ['error' => $e->getMessage()]);
+        }
+        return Writer::jsonOutput($response, 201, ['message' => 'created']);
     }
 
     /**
@@ -363,8 +388,6 @@ class EventController
      *
      * Cette fonction permet de renseigner dans la base de donnée le choix de l'utilisateur à un événement,
      * si il participera ou non à l'événement. Cette fonction modifie le choix de l'utilisateur
-     *
-     * A renseigner
      *
      * @param Request $request
      * @param Response $response
@@ -378,7 +401,11 @@ class EventController
         $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
         $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
 
-        $user = User::with('events')->find($token->upr->id);
+        if($token->upr->id !== $args['user_id']){
+            return Writer::jsonOutput($response, 401, ['error' => 'Unauthorized']);
+        }
+
+        $user = User::with('events')->find($args['user_id']);
         $user->events()->updateExistingPivot($args['event_id'],array('choice' => $pars['choice']),false);
 
         return Writer::jsonOutput($response, 200, ['message' => 'created']);
@@ -390,8 +417,6 @@ class EventController
      * Cette fonction permet de renseigner dans la base de donnée un message envoyé par un utilisateur dans un
      * événement donné. Un message pouvant être envoyé seulement par un utilisateur connecté, on regarde dans le token envoyé
      * pour connaitre l'id de l'auteur du message.
-     *
-     * A renseigner
      *
      * @param Request $request
      * @param Response $response
@@ -405,12 +430,30 @@ class EventController
         $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
         $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
 
-        $user = User::with('messages')->find($token->upr->id);
+        $user = User::with('messages')->where('id', '=', $token->upr->id)->first();
+        //$user = User::with('messages')->find($token->upr->id);
         $user->messages()->attach($args['eventId'],['content'=> $pars['content'], 'date' => date('y-m-d H:i:s')]);
 
-        return Writer::jsonOutput($response, 200, ['message' => 'created']);
+        //$message = $user->messages;
+
+        return Writer::jsonOutput($response, 201, ['message' => 'created']);
     }
 
+    /**
+     * Fonction permettant de supprimer un événement
+     *
+     * Cette fonction supprime un évènement en commençant par supprimer dans les tables pivots
+     * (message et user_event les données liées à un évènement, puis par supprimer les guests liés à cet évènement
+     * pour enfin supprimer l'évènement lui même.
+     *
+     * Seul le créateur de l'évènement peut le supprimer. On vérifie donc si l'id de l'utilisateur contenu dans son token de connexion
+     * correspond à l'id du créteur de l'évènement.
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
     public function deleteEvent(Request $request, Response $response, $args): Response
     {
         if (!isset($request->getHeader('Authorization')[0])){
@@ -421,7 +464,7 @@ class EventController
             $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
         }
         catch (\Exception $e){
-            return Writer::jsonOutput($response, 403, ['message' => $e]);
+            return Writer::jsonOutput($response, 403, ['message' => $e->getMessage()]);
         }
         $event = Event::find($args['id']);
 
@@ -442,22 +485,5 @@ class EventController
         $response->getBody()->write(json_encode(['response' => 'Event deleted']));
 
         return Writer::jsonOutput($response, 200, ['message' => 'deleted']);
-    }
-
-    public function postInvitation(Request $request, Response $response, $args): Response {
-        $pars = $request->getParsedBody();
-        $user = User::where('mail', '=', $pars['mail'])->first();
-
-        if (isset($user)){
-            try {
-                $user->events()->attach($args['eventId'],['choice'=> 2]);
-            }
-            catch (\Exception $e) {
-                return Writer::jsonOutput($response, 401, ['error' => 'User already in event']);
-            }
-            return Writer::jsonOutput($response, 200, ['message' => 'User invited', 'user' => ['user_id'=> $user->id,'firstname' => $user->firstname, 'lastname' => $user->lastname, 'mail' => $user->mail]]);
-        } else {
-            return Writer::jsonOutput($response, 401, ['error' => 'Inexistant user']);
-        }
     }
 }

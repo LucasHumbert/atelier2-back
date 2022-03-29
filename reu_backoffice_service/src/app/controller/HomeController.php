@@ -10,6 +10,18 @@ use reu\backoffice\app\utils\Writer;
 
 class HomeController
 {
+    /**
+     * Fonction permettant de poster un message sur un événement
+     *
+     * Cette fonction permet de renseigner dans la base de donnée un message envoyé par un utilisateur dans un
+     * événement donné. Un message pouvant être envoyé seulement par un utilisateur connecté, on regarde dans le token envoyé
+     * pour connaitre l'id de l'auteur du message.
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
     public function getInfos(Request $request, Response $response): Response
     {
         $users = User::all();
