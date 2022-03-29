@@ -5,6 +5,7 @@ namespace reu\event\app\controller;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Respect\Validation\Rules\Even;
 use reu\event\app\model\Event;
 use reu\event\app\model\Guest;
 use reu\event\app\model\Message;
@@ -183,15 +184,15 @@ class EventController
 
             //add link to get event users
             if(isset($users)){
-                $data['links']['users'] = ['href' => 'http://api.event.local:62560/events/' . $event->id .'/users'];
+                $data['links']['users'] = ['href' => 'http://51.159.78.9:62560/events/' . $event->id .'/users'];
             }
             //add link to get event messages
             if(isset($messages)){
-                $data['links']['messages'] = ['href' => 'http://api.event.local:62560/events/' . $event->id . '/messages'];
+                $data['links']['messages'] = ['href' => 'http://51.159.78.9:62560/events/' . $event->id . '/messages'];
             }
             //add link to get event messages
             if(isset($guests)){
-                $data['links']['guests'] = ['href' => 'http://api.event.local:62560/events/' . $event->id . '/guests'];
+                $data['links']['guests'] = ['href' => 'http://51.159.78.9:62560/events/' . $event->id . '/guests'];
             }
 
             return Writer::jsonOutput($response, 200, $data);
@@ -430,11 +431,19 @@ class EventController
         $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
         $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
 
-        $user = User::with('messages')->where('id', '=', $token->upr->id)->first();
-        //$user = User::with('messages')->find($token->upr->id);
-        $user->messages()->attach($args['eventId'],['content'=> $pars['content'], 'date' => date('y-m-d H:i:s')]);
+        $event = Event::with('messages')->find($args['eventId']);
+        $event->messages()->attach($token->upr->id, ['content'=> $pars['content'], 'date' => date('y-m-d H:i:s')]);
 
-        //$message = $user->messages;
+        $message = [];
+        foreach ($event->messages as $messageUser) {
+            $message[] = $messageUser->pivot;
+        }
+
+        foreach ($event->messages as $messageUser) {
+            if($messageUser->pivot->user_id === $token->upr->id && $messageUser->pivot->event_id === $args['eventId']){
+                return Writer::jsonOutput($response, 200, ['message' => $messageUser->pivot]);
+            }
+        }
 
         return Writer::jsonOutput($response, 201, ['message' => 'created']);
     }

@@ -72,9 +72,6 @@ $app->put('/users/{id}[/]', UserController::class . ':putUser');
 $app->get('/guests/{idEvent}[/]', GuestController::class . ':getGuests');
 $app->post('/guests/{idEvent}[/]', GuestController::class . ':postGuest');
 
-//
-//$app->get('users/{id}/events');
-
 $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function($req, $res) {
     $handler = $this->notFoundHandler; // handle using the default Slim page not found handler
     return $handler($req, $res);
