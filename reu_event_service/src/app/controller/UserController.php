@@ -32,6 +32,16 @@ class UserController
         $this->c = $c;
     }
 
+    /**
+     * Fonction de récupération d'un utilisateur.
+     *
+     * Cette fonction permet de récupérer un utilisateur si et seulement si le token d'authorisation appartient à ce dernier.
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
     public function getUser(Request $request, Response $response, $args): Response
     {
         try {
@@ -42,7 +52,7 @@ class UserController
             }
         }
         catch (\Exception $e){
-            return Writer::jsonOutput($response, 403, ['message' => $e]);
+            return Writer::jsonOutput($response, 403, ['message' => $e->getMessage()]);
         }
         try {
             $user = User::find($args['id'],['firstname', 'lastname']);
@@ -53,6 +63,17 @@ class UserController
         return Writer::jsonOutput($response, 200, ['user' => $user]);
     }
 
+    /**
+     * Fonction de modification d'un utilisateur.
+     *
+     * Cette fonction permet de modifier les informations d'un utilisateur si et seulement si le token d'authorisation appartient à ce dernier.
+     * Filtrage des paramètres passés dans le body de la requête.
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
     public function putUser(Request $request, Response $response, $args): Response
     {
         try {
@@ -64,7 +85,7 @@ class UserController
             }
         }
         catch (\Exception $e){
-            return Writer::jsonOutput($response, 403, ['message' => $e]);
+            return Writer::jsonOutput($response, 403, ['message' => $e->getMessage()]);
         }
         try {
             $user = User::find($args['id']);
@@ -73,11 +94,20 @@ class UserController
             $user->save();
         }
         catch (\Exception $e) {
-            return Writer::jsonOutput($response, $e->getCode(), ['message' => $e]);
+            return Writer::jsonOutput($response, $e->getCode(), ['message' => $e->getMessage()]);
         }
         return Writer::jsonOutput($response, 200, ['message' => 'User updated']);
     }
 
+    /**
+     * Fonction de récupération des évènements et le choix où est l'utilisateur via son id passé en paramètre.
+     *Cette fonction retourne les évènements si et seulement si le token d'authorisation appartient à l'utilisateur.
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
     public function getUsersEvents(Request $request, Response $response, $args)
     {
         try {
@@ -88,7 +118,7 @@ class UserController
             }
         }
         catch (\Exception $e){
-            return Writer::jsonOutput($response, 403, ['message' => $e]);
+            return Writer::jsonOutput($response, 403, ['message' => $e->getMessage()]);
         }
         try {
             $user = User::with('events')

@@ -31,12 +31,33 @@ class GuestController
         $this->c = $c;
     }
 
+    /**
+     * Fonction de récupération des guests
+     *
+     * Cette fonction permet de récupérer les guests d'un évènement.
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
+
     public function getGuests(Request $request, Response $response, $args): Response
     {
         $guests = Guest::where('event_id', '=', $args['idEvent'])->get();
         return Writer::jsonOutput($response, 200, ['guests' => $guests]);
     }
 
+    /**
+     * Fonction de récupération des guests
+     *
+     * Cette fonction permet de créer un guest en le lien à un évènement en filtrant les données dans le body de la requête.
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
     public function postGuest(Request $request, Response $response, $args): Response
     {
         $pars = $request->getParsedBody();
@@ -48,7 +69,7 @@ class GuestController
             $guest->save();
 
         } catch (\Exception $e) {
-            return Writer::jsonOutput($response, 200, ['message' => $e]);
+            return Writer::jsonOutput($response, 200, ['message' => $e->getMessage()]);
         }
         return Writer::jsonOutput($response, 200, ['guest' => $guest]);
     }

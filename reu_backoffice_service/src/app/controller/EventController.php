@@ -13,6 +13,16 @@ use reu\backoffice\app\utils\Writer;
 
 class EventController
 {
+    /**
+     * Fonction de récupération des événements
+     *
+     * Cette fonction retourne tous les événements.
+     * On retourne l'inactivité de l'évènement en calculant si la date de l'évènement est passé depuis 1 an ou plus.
+     *
+     * @param Request $request
+     * @param Response $response
+     * @return Response
+     */
     public function getEvents(Request $request, Response $response): Response
     {
         $events = Event::with('messages')->get();
@@ -45,6 +55,19 @@ class EventController
         return Writer::jsonOutput($response, 200, ['events' => $events->makeHidden(['messages'])]);
     }
 
+    /**
+     * Fonction de récupération d'un événement
+     *
+     * Cette fonction retourne un événement en fonction de l'id dans le paramètre de la route.
+     *
+     * - Si la requête contient le paramêtre embed (de type array), la réponse retourne des informations supplémentaires sur
+     * les messages et/ou les utilisateurs liés à l'évènement.
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
     public function getEvent(Request $request, Response $response, $args): Response
     {
         //Try to find event
