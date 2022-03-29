@@ -428,24 +428,27 @@ class EventController
     {
         $pars = $request->getParsedBody();
 
-        $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
-        $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
+        try {
+            $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
+            $token = JWT::decode($tokenstring, new Key($this->c['secret'], 'HS512'));
 
-        $event = Event::with('messages')->find($args['eventId']);
-        $event->messages()->attach($token->upr->id, ['content'=> $pars['content'], 'date' => date('y-m-d H:i:s')]);
-
-        $message = [];
-        foreach ($event->messages as $messageUser) {
-            $message[] = $messageUser->pivot;
+            $event = Event::with('messages')->find($args['eventId']);
+            $event->messages()->attach($token->upr->id, ['content' => $pars['content'], 'date' => date('y-m-d H:i:s')]);
+        }
+        catch (\Exception $e){
+            return Writer::jsonOutput($response, 400, ['error' => $e->getMessage()]);
         }
 
-        foreach ($event->messages as $messageUser) {
-            if($messageUser->pivot->user_id === $token->upr->id && $messageUser->pivot->event_id === $args['eventId']){
-                return Writer::jsonOutput($response, 200, ['message' => $messageUser->pivot]);
+        $event = Event::with('messages')->find($args['eventId']);
+        $msg = $event->messages[0]->pivot;
+        foreach ($event->messages as $eventMessages) {
+            if($eventMessages->pivot->date > $msg->date && $eventMessages->pivot->user_id === $token->upr->id && $eventMessages->pivot->event_id === $args['eventId']){
+                $msg = $eventMessages->pivot;
             }
         }
 
-        return Writer::jsonOutput($response, 201, ['message' => 'created']);
+
+        return Writer::jsonOutput($response, 201, ['message' => $msg]);
     }
 
     /**
