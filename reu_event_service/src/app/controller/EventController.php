@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Respect\Validation\Rules\Even;
 use reu\event\app\model\Event;
 use reu\event\app\model\Guest;
-use reu\event\app\model\Message;
 use reu\event\app\model\User;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -397,6 +396,7 @@ class EventController
      */
     public function putChoice (Request $request, Response $response, $args): Response
     {
+
         $pars = $request->getParsedBody();
 
         $tokenstring = sscanf($request->getHeader('Authorization')[0], "Bearer %s")[0];
@@ -407,9 +407,10 @@ class EventController
         }
 
         $user = User::with('events')->find($args['user_id']);
-        $user->events()->updateExistingPivot($args['event_id'],array('choice' => $pars['choice']),false);
+        $user->events()->updateExistingPivot($args['event_id'],array('choice' => $pars['choice']),true);
 
-        return Writer::jsonOutput($response, 200, ['message' => 'created']);
+
+        return Writer::jsonOutput($response, 201, ['message' => 'updated']);
     }
 
     /**
