@@ -49,7 +49,7 @@ class AuthController
      *
      * @param Request $rq Requête POST avec firstname, lastname, mail, password, confirmpassword
      * @param Response $rs
-     * @return Response
+     * @return Response Retourne L'utilisateur crée
      */
     public function signup(Request $rq, Response $rs): Response
     {
@@ -89,7 +89,7 @@ class AuthController
      * @param Request $rq GET Request avec Authorization header où se trouve le token
      * @param Response $rs
      * @param $args
-     * @return Response
+     * @return Response Retourne les informations lié au compte stocké dans le token
      */
     public function checkToken(Request $rq, Response $rs, $args): Response
     {
@@ -119,7 +119,7 @@ class AuthController
      *
      * @param Request $rq GET avec un Authorization header de type BasicAuth
      * @param Response $rs
-     * @return Response
+     * @return Response Retourne le token d'accès, le refresh token ainsi que UUID de l'utilisateur
      * @throws \Exception
      */
     public function authenticate(Request $rq, Response $rs): Response
