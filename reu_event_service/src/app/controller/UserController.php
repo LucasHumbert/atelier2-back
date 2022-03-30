@@ -37,10 +37,10 @@ class UserController
      *
      * Cette fonction permet de récupérer un utilisateur si et seulement si le token d'authorisation appartient à ce dernier.
      *
-     * @param Request $request
+     * @param Request $request GET avec un header Authorization de type Bearer et en id l'id de l'utilisateur à récuperer.
      * @param Response $response
      * @param $args
-     * @return Response
+     * @return Response Retourne une 200 avec les informations de l'utilisateurs.
      */
     public function getUser(Request $request, Response $response, $args): Response
     {
@@ -55,7 +55,7 @@ class UserController
             return Writer::jsonOutput($response, 403, ['message' => $e->getMessage()]);
         }
         try {
-            $user = User::find($args['id'],['firstname', 'lastname']);
+            $user = User::with('messages')->find($args['id'],['firstname', 'lastname']);
         }
         catch (ModelNotFoundException $e) {
             return Writer::jsonOutput($response, 404, ['message' => 'Utilisateur introuvable']);
@@ -69,10 +69,10 @@ class UserController
      * Cette fonction permet de modifier les informations d'un utilisateur si et seulement si le token d'authorisation appartient à ce dernier.
      * Filtrage des paramètres passés dans le body de la requête.
      *
-     * @param Request $request
+     * @param Request $request PUT avec dans le body le firstname et le lastname ainsi que le token envoyé en bearer.
      * @param Response $response
      * @param $args
-     * @return Response
+     * @return Response Renvoie une 200 avec un message de confirmation de la modification de l'utilisateur.
      */
     public function putUser(Request $request, Response $response, $args): Response
     {
@@ -103,10 +103,10 @@ class UserController
      * Fonction de récupération des évènements et le choix où est l'utilisateur via son id passé en paramètre.
      *Cette fonction retourne les évènements si et seulement si le token d'authorisation appartient à l'utilisateur.
      *
-     * @param Request $request
+     * @param Request $request On envoie un token dans un header authorization au format bearer avec dans l'url le id de l'utilisateur.
      * @param Response $response
      * @param $args
-     * @return Response
+     * @return Response Retourne une 200 suivis d'un tableau d'event.
      */
     public function getUsersEvents(Request $request, Response $response, $args)
     {

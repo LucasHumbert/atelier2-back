@@ -9,8 +9,28 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use reu\backoffice\app\utils\Writer;
 
+/**
+ * Class UserController
+ *
+ * @author HUMBERT Lucas
+ * @author BUDZIK Valentin
+ * @author HOUQUES Baptiste
+ * @author LAMBERT Calvin
+ * @package reu\event\app\controller
+ *
+ */
+
 class UserController
 {
+    /**
+     * Fonction de récupération des utilisateurs
+     *
+     * Cette fonction permet de récuperer les utilisateurs du site.
+     *
+     * @param Request $request
+     * @param Response $response
+     * @return Response
+     */
     public function getUsers(Request $request, Response $response): Response
     {
         $users = User::all();

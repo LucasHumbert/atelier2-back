@@ -42,9 +42,9 @@ class EventController
      *
      * Si ajout du paramètre 'creator_id' dans l'uri de la requête : la réponse retourne tous les évènements liés à l'utilisateur correspondant à cet id
      *
-     * @param Request $request
+     * @param Request $request Peut contenir le paramètre creator_id. Contient un token de type Bearer utilisateur dans le header 'Authorization'.
      * @param Response $response
-     * @return Response
+     * @return Response Retourne tous les évènements publics . Si paramètre creator_id : retourne un objet 'events' contenant tous les évènements dont l'id du créateur correspond à celui renseigné.
      */
     public function getEvents(Request $request, Response $response): Response
     {
@@ -79,10 +79,10 @@ class EventController
      * - Si la requête contient le paramêtre filter (de type array), la réponse retourne le choix de l'utilisateur (via son token de connexion)
      * concernant l'évènement retourné.
      *
-     * @param Request $request
+     * @param Request $request Peut contenir le paramètre 'embed' (de type array) (avec comme valeurs 'messages', 'users', et/ou guests) et/ou le paramètre filter (de type array) (avec comme valeur userConnected). Contient un token de type Bearer utilisateur dans le header 'Authorization'. Contient un token de type Bearer utilisateur dans le header 'Authorization'.
      * @param Response $response
-     * @param $args
-     * @return Response
+     * @param $args Contient le paramètre id de l'évènement choisis.
+     * @return Response Retourne un objet 'data' contenant le type de l'object et l'évènement avec son lien. Si paramètre filter avec la valeur userConnected : retourne l'évènement choisis et si il contient l'utilisateur lié au token du header. Si paramètre embed avec la valeur messages : retourne l'évènement avec tous les messages liés. Si paramètre embed avec la valeur users : retourne l'évènement avec tous les utilisateurs liés. Si paramètre embed avec la valeur guests : retourne l'évènement avec tous les guests liés.
      */
     public function getEvent(Request $request, Response $response, $args): Response
     {
@@ -216,8 +216,8 @@ class EventController
      *
      * @param Request $request
      * @param Response $response
-     * @param $args
-     * @return Response
+     * @param $args Contient le paramètre id de l'évènement choisis.
+     * @return Response Retourne un objet 'data' contenant le type de l'objet et les messages avec son lien.
      */
     public function getEventMessages(Request $request, Response $response, $args): Response
     {
@@ -256,8 +256,8 @@ class EventController
      *
      * @param Request $request
      * @param Response $response
-     * @param $args
-     * @return Response
+     * @param $args Contient le paramètre id de l'évènement choisis.
+     * @return Response Retourne un objet 'data' contenant le type de l'objet et les utilisateurs de l'évènement avec son lien.
      */
     public function getEventUsers(Request $request, Response $response, $args): Response
     {
@@ -290,9 +290,9 @@ class EventController
      * Cette fonction permet de créer un événement en s'assurant au préalable que tous les champs sont bien
      * renseigner et en appliquant des filtres sur ces derniers.
      *
-     * @param Request $request
+     * @param Request $request Contient les données de l'évènement à créer. Contient un token de type Bearer utilisateur dans le header 'Authorization'.
      * @param Response $response
-     * @return Response
+     * @return Response Retourne une donnée JSON contenant les informations de l'évènement crée
      */
     public function postEvent (Request $request, Response $response): Response
     {
@@ -341,10 +341,10 @@ class EventController
      * Si le paramètre findUserBy est présent dans l'uri de la requête,
      * L'attache de utilisateur à un évènement se fera via son email en renseignant son choix à 2 (indécis).
      *
-     * @param Request $request
+     * @param Request $request POST contenant le 'mail' de l'utilisateur ainsi que son choix 'choice'.
      * @param Response $response
      * @param $args
-     * @return Response
+     * @return Response Retourne au format JSON un message ainsi que les info de l'utilisateur invité.
      */
     public function postEventUser (Request $request, Response $response, $args): Response
     {
@@ -389,10 +389,10 @@ class EventController
      * Cette fonction permet de renseigner dans la base de donnée le choix de l'utilisateur à un événement,
      * si il participera ou non à l'événement. Cette fonction modifie le choix de l'utilisateur
      *
-     * @param Request $request
+     * @param Request $request PUT contenant un champ choice qui est un int définissant le choix de l'utilisateur.
      * @param Response $response
      * @param $args
-     * @return Response
+     * @return Response Retourne au format JSON un un message de confirmation d'update du choix.
      */
     public function putChoice (Request $request, Response $response, $args): Response
     {
@@ -420,10 +420,10 @@ class EventController
      * événement donné. Un message pouvant être envoyé seulement par un utilisateur connecté, on regarde dans le token envoyé
      * pour connaitre l'id de l'auteur du message.
      *
-     * @param Request $request
+     * @param Request $request POST avec le content du message. La requete doit aussi contenir un Header Authorization de type Bearer contentant le token de l'utilisateur on passe dans le lien l'id de l'event.
      * @param Response $response
      * @param $args
-     * @return Response
+     * @return Response Retourne au format JSON un code 201 avec un message récapitulant le message.
      */
     public function postMessage (Request $request, Response $response, $args): Response
     {
@@ -462,10 +462,10 @@ class EventController
      * Seul le créateur de l'évènement peut le supprimer. On vérifie donc si l'id de l'utilisateur contenu dans son token de connexion
      * correspond à l'id du créteur de l'évènement.
      *
-     * @param Request $request
+     * @param Request $request DELETE doit contenir un header Authorization de type Bearer contenant le token de l'utilisateur. On passe dans l'URL l'id de l'évènement.
      * @param Response $response
      * @param $args
-     * @return Response
+     * @return Response Retourne au format JSON un code 200 suivis d'un message de confirmation de suppression.
      */
     public function deleteEvent(Request $request, Response $response, $args): Response
     {
