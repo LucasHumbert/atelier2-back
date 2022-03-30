@@ -162,7 +162,7 @@ class EventController
             }
 
             $data = ["type" => "ressource",
-                "event" => $event];
+                "event" => $event->makeHidden(['messages', 'users'])];
 
             //add users to the response
             if(isset($users)){
