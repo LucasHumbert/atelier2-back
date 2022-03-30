@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: canals5
- * Date: 18/11/2019
- * Time: 15:27
- */
 
 namespace reu\auth\app\controller;
 
@@ -22,21 +16,41 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Container;
 
-
 /**
- * Class LBSAuthController
- * @package lbs\command\api\controller
+ * Class AuthCOntroller
+ *
+ * @author HUMBERT Lucas
+ * @author BUDZIK Valentin
+ * @author HOUQUES Baptiste
+ * @author LAMBERT Calvin
+ * @package reu\auth\app\controller
+ *
  */
+
 class AuthController
 {
 
     private $c;
 
+    /**
+     * Constructeur de l'auth controller
+     *
+     * @param Container $c
+     */
     public function __construct(Container $c)
     {
         $this->c = $c;
     }
 
+    /**
+     * Fonction de connexion
+     *
+     * Fonction d'inscription de l'utilisateur à la plateform.
+     *
+     * @param Request $rq Requête POST avec firstname, lastname, mail, password, confirmpassword
+     * @param Response $rs
+     * @return Response
+     */
     public function signup(Request $rq, Response $rs): Response
     {
         $bodyParam = $rq->getParsedBody();
@@ -67,7 +81,16 @@ class AuthController
         return Writer::jsonOutput($rs, 201, ['user' => $user]);
     }
 
-
+    /**
+     * Fonction de vérification du token
+     *
+     * Permet de récuperer le token afin de regarder ça validité et obtenir des informations sur le compte auquel il est relié
+     *
+     * @param Request $rq GET Request avec Authorization header où se trouve le token
+     * @param Response $rs
+     * @param $args
+     * @return Response
+     */
     public function checkToken(Request $rq, Response $rs, $args): Response
     {
         if (!$rq->hasHeader('Authorization')) {
@@ -89,7 +112,17 @@ class AuthController
         return $rs;
     }
 
-    public function authenticate(Request $rq, Response $rs, $args): Response
+    /**
+     * Fonction d'authentification des utilisateurs.
+     *
+     * Dans cette fonction on envoie les données utilisateurs afin de récupérer le token généré.
+     *
+     * @param Request $rq GET avec un Authorization header de type BasicAuth
+     * @param Response $rs
+     * @return Response
+     * @throws \Exception
+     */
+    public function authenticate(Request $rq, Response $rs): Response
     {
 
         if (!$rq->hasHeader('Authorization')) {
