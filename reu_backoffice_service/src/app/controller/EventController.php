@@ -10,6 +10,16 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use reu\backoffice\app\utils\Writer;
 
+/**
+ * Class UserController
+ *
+ * @author HUMBERT Lucas
+ * @author BUDZIK Valentin
+ * @author HOUQUES Baptiste
+ * @author LAMBERT Calvin
+ * @package reu\event\app\controller
+ *
+ */
 
 class EventController
 {
@@ -19,9 +29,9 @@ class EventController
      * Cette fonction retourne tous les événements.
      * On retourne l'inactivité de l'évènement en calculant si la date de l'évènement est passé depuis 1 an ou plus.
      *
-     * @param Request $request
+     * @param Request $request GET
      * @param Response $response
-     * @return Response
+     * @return Response Retourne au format JSON la liste des évènements
      */
     public function getEvents(Request $request, Response $response): Response
     {

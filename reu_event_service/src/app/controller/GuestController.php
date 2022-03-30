@@ -36,10 +36,10 @@ class GuestController
      *
      * Cette fonction permet de récupérer les guests d'un évènement.
      *
-     * @param Request $request
+     * @param Request $request GET on passe dans le lien l'id de l'event.
      * @param Response $response
      * @param $args
-     * @return Response
+     * @return Response Retourne au format JSON un code 200 suivis des info du guest.
      */
 
     public function getGuests(Request $request, Response $response, $args): Response
@@ -53,10 +53,10 @@ class GuestController
      *
      * Cette fonction permet de créer un guest en le lien à un évènement en filtrant les données dans le body de la requête.
      *
-     * @param Request $request
+     * @param Request $request POST avec un nom dans le body et dans le lien l'id de l'evenement.
      * @param Response $response
      * @param $args
-     * @return Response
+     * @return Response Retourne un code 200 avec les informations du guest invité.
      */
     public function postGuest(Request $request, Response $response, $args): Response
     {

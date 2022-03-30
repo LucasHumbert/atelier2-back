@@ -8,6 +8,17 @@ use reu\backoffice\app\model\Event;
 use reu\backoffice\app\model\User;
 use reu\backoffice\app\utils\Writer;
 
+/**
+ * Class UserController
+ *
+ * @author HUMBERT Lucas
+ * @author BUDZIK Valentin
+ * @author HOUQUES Baptiste
+ * @author LAMBERT Calvin
+ * @package reu\event\app\controller
+ *
+ */
+
 class HomeController
 {
     /**
