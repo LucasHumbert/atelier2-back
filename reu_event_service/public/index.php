@@ -61,7 +61,6 @@ $app->put('/events/{event_id}/users/{user_id}[/]', EventController::class . ':pu
 $app->delete('/events/{id}[/]', EventController::class . ':deleteEvent');
 $app->get('/events/{id}/messages[/]', EventController::class . ':getEventMessages');
 $app->post('/events/{eventId}/message[/]', EventController::class . ':postMessage');
-$app->post('/events/{eventId}/invitation[/]', EventController::class . ':postInvitation');
 
 //Users routes
 $app->get('/users/{id}[/]', UserController::class . ':getUser');
