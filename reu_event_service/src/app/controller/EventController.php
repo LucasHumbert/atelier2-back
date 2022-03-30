@@ -499,4 +499,26 @@ class EventController
 
         return Writer::jsonOutput($response, 200, ['message' => 'deleted']);
     }
+
+    /**
+     * Fonction permettant d'inviter un utilisateur'
+     *
+     * Cette fonction permet d'inviter un autre utilisateur à un événement en renseignant son adresse mail.
+     *
+     * @param Request $request POST avec mail
+     * @param Response $response
+     * @param $args
+     * @return Response Retourne un message avec les informations de l'utilisateur invité
+     */
+    public function postInvitation(Request $request, Response $response, $args): Response {
+        $pars = $request->getParsedBody();
+        $user = User::where('mail', '=', $pars['mail'])->first();
+
+        if (isset($user)){
+            $user->events()->attach($args['eventId'],['choice'=> 2]);
+            return Writer::jsonOutput($response, 200, ['message' => 'User invited', 'user' => ['user_id'=> $user->id,'firstname' => $user->firstname, 'lastname' => $user->lastname, 'mail' => $user->mail]]);
+        } else {
+            return Writer::jsonOutput($response, 401, ['error' => 'Inexistant user']);
+        }
+    }
 }
